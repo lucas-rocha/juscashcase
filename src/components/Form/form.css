@@ -1,17 +1,18 @@
-.login-container {
+.form-container {
   display: flex;
   flex-direction: column;
   justify-content: center;
   width: 100%;
   min-height: 100vh;
   background-color: white;
-  padding: 20px;
+  padding: 1rem;
 }
 
 @media (min-width: 768px) {
-  .login-container {
+  .form-container {
     max-width: 600px;
     margin: 0 auto;
+    padding: 3rem;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   }
 }
@@ -19,8 +20,13 @@
 .logo {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 4px;
   margin-bottom: 40px;
+}
+
+.logo img {
+  width: 280px;
 }
 
 .logo-text {
@@ -29,53 +35,12 @@
   font-weight: bold;
 }
 
-.login-form {
+.form {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-label {
-  color: var(--primary-color);
-  font-size: 14px;
-}
-
-input {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 16px;
-  outline: none;
-}
-
-input:focus {
-  border-color: var(--secondary-color);
-}
-
-.password-field {
-  position: relative;
-}
-
-.password-toggle {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
 
 .login-button {
   width: 100%;
