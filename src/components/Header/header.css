@@ -1,0 +1,33 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  background: var(--blue-color);
+  border-bottom: 2px solid #F1F4F9;
+  padding: 1rem;
+}
+
+.header__logo {
+  width: 170px;
+}
+
+.header__actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.header__actions > img {
+  width: 25px;
+}
+
+.header__actions > span {
+  display: none;
+}
+
+@media (min-width: 576px) {
+  .header__actions > span {
+    display: block;
+  }
+}
