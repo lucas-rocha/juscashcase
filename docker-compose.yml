@@ -1,0 +1,25 @@
+version: '3.8'
+services:
+  database:
+    image: postgres:15
+    container_name: juscash_database
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: juscash2025
+      POSTGRES_DB: juscash_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  api:
+    build: .
+    container_name: juscash_api
+    ports:
+      - "3000:3000"
+    depends_on:
+      - database
+
+volumes:
+  postgres_data:
