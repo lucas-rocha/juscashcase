@@ -23,13 +23,14 @@ model User {
 }
 
 model Publications {
-  id              String      @id @default(uuid())
-  processNumber   String
-  authors         String
-  lawyers         String
-  content         String
-  principalValue  Decimal
-  interestValue   Decimal
-  attorneyFees    Decimal
-  status          String
+  id                String      @id @default(uuid())
+  processNumber     String
+  authors           String
+  lawyers           String
+  content           String
+  availabilityData  DateTime
+  principalValue    Decimal
+  interestValue     Decimal
+  attorneyFees      Decimal
+  status            String
 }
