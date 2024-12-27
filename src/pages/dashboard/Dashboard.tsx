@@ -1,4 +1,5 @@
 import Header from '../../components/Header/Header'
+import Kanban from '../../components/Kanban/Kanban'
 import KanbanFilter from '../../components/KanbanFilter/KanbanFilter'
 import './dashboard.css'
 
@@ -10,6 +11,7 @@ const Dashboard: React.FC = () => {
         <div className="kanban-filter__container">
           <KanbanFilter />
         </div>
+        <Kanban />
       </div>
     </>
   )
