@@ -30,6 +30,8 @@ const router = express.Router()
 const publicationController = new PublicationController()
 
 router.get('/', publicationController.getPublications)
+router.put('/:id', publicationController.updatePublicationStatus)
+
 
 
 module.exports = router
