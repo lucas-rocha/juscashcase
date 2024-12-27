@@ -5,9 +5,11 @@ interface PasswordInputProps {
   label: string;
   id: string;
   type?: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const PasswordInput: React.FC<PasswordInputProps> = ({ label, id }) => {
+const PasswordInput: React.FC<PasswordInputProps> = ({ label, id, value, onChange }) => {
   const [showPassword, setShowPassword] = useState(false)
   
   return (
@@ -18,6 +20,8 @@ const PasswordInput: React.FC<PasswordInputProps> = ({ label, id }) => {
         type={showPassword ? "text" : "password"}
         id={id}
         required
+        value={value}
+        onChange={onChange}
       />
       <button 
         type="button" 

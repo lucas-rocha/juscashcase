@@ -3,8 +3,14 @@ import { AuthContext } from "../contexts/AuthContext";
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  login: () => void;
+  login: (data: LogInData) => void;
   logout: () => void;
+  loading: boolean;
+}
+
+type LogInData = {
+  email: string;
+  password: string;
 }
 
 export const useAuth = (): AuthContextType => {
