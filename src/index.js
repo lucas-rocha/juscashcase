@@ -1,7 +1,7 @@
 const express = require('express')
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./swaggerConfig');
-const userRoutes = require('./src/routes/userRoutes');
+const userRoutes = require('./routes/userRoutes');
 
 const app = express()
 const port = 3000
