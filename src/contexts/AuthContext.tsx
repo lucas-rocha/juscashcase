@@ -49,7 +49,7 @@ export function AuthProvider({ children }: any) {
     api.defaults.headers['x-access-token'] = token
     
     setIsAuthenticated(true);
-    navigate('/dashboard')
+    navigate('/')
   }
 
   const logout = () => {

@@ -1,17 +1,12 @@
 import React from 'react';
 import Dashboard from './pages/dashboard/Dashboard';
-import { useAuth } from './hooks/useAuth';
-import { BrowserRouter, Route, Router, Routes } from 'react-router-dom';
-// import SignUp from './pages/signUp/SignUp';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Login from './pages/login/Login';
 import PrivateRoute from './components/PrivateRoute';
 import { AuthProvider } from './contexts/AuthContext';
+import SignUp from './pages/signUp/SignUp';
 
 const App: React.FC = () => {
-  const { isAuthenticated, login, logout } = useAuth();
-
-  console.log(isAuthenticated)
-
   return (
     <BrowserRouter>
       <AuthProvider>
@@ -19,8 +14,9 @@ const App: React.FC = () => {
 
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/criar-conta" element={<SignUp />} />
           <Route
-            path="/dashboard"
+            path="/"
             element={
               <PrivateRoute>
                 <Dashboard />
