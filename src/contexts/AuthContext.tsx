@@ -48,15 +48,15 @@ export function AuthProvider({ children }: any) {
     
     api.defaults.headers['x-access-token'] = token
     
-    if(token) {
-      
-    }
-
     setIsAuthenticated(true);
     navigate('/dashboard')
   }
 
-  const logout = () => setIsAuthenticated(false);
+  const logout = () => {
+    destroyCookie(undefined, "@juscash.token")
+    setIsAuthenticated(false)
+    navigate('/login')
+  }
 
   return (
     <AuthContext.Provider value={{ isAuthenticated, login, logout, loading }}>
