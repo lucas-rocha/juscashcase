@@ -1,3 +1,4 @@
+version: '3.8'
 services:
   database:
     image: postgres:15
@@ -16,20 +17,18 @@ services:
     build: ./juscash-api
     container_name: juscash_api
     ports:
-      - "3000:3000"
+      - "5000:5000"
     depends_on:
       - database
+    volumes:
+    - ./juscash-api:/usr/src/app
+    - /usr/src/app/node_modules
 
   front:
     build: ./juscash-front
     container_name: juscash_front
     ports:
       - "3000:3000"
-    volumes:
-      - ./front:/usr/src/app
-      - /usr/src/app/node_modules
-    command: ["npm", "start"]
-
 
 volumes:
   postgres_data:
