@@ -33,7 +33,7 @@ class UserService {
       throw new Error('User not found!')
 
     if(!await AuthService.comparePasswords(password, user.password))
-      throw new Error('Password does not match!')
+      throw new Error('Unauthorized')
 
     const token = AuthService.generateToken(user.id)
 
