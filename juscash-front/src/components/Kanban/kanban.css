@@ -1,0 +1,8 @@
+.kanban__title {
+  border: 1px solid #ccc;
+  padding: .6rem;
+}
+
+.kanban__body {
+  padding: .6rem;
+}

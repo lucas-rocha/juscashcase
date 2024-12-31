@@ -1,0 +1,74 @@
+.kanban-filter {
+  margin-top: 2rem;
+}
+
+@media (min-width: 678px) {
+  .kanban-filter {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+.kanban-filter__intro {
+  display: flex;
+  gap: .5rem;
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 678px) {
+  .kanban-filter__intro {
+    margin: 0;
+  }
+}
+
+.kanban-filter__intro > img {
+  width: 38px;
+}
+
+.kanban-filter__intro h2 {
+  color: var(--primary-color);
+}
+
+.kanban-filter__inputs {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+}
+
+@media (min-width: 678px) {
+  .kanban-filter__inputs {
+    flex-direction: row;
+  }
+}
+
+.kanban-filter__group {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+}
+
+.kanban-filter__column {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+
+.kanban-filter__column input {
+  max-width: 125px;
+}
+
+.kanban-filter__group label {
+  color: var(--primary-color);
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.kanban-filter__group input {
+  width: 100%;
+  padding: 4px;
+  border: 1px solid #C4C8CC;
+  border-radius: 4px;
+  font-size: 16px;
+  outline: none;
+}

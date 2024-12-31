@@ -1,0 +1,19 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* Reset CSS */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Estilos globais */
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--blue-color);
+  color: #333;
+}
+
+button {
+  font-family: 'Inter', sans-serif;
+}
