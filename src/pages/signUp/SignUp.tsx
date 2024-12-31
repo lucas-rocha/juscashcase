@@ -16,7 +16,7 @@ const SignUp: React.FC = () => {
   }
 
   return (
-    <Form buttonValue="Criar conta" onClick={(e) => handleSubmit(e)}>
+    <Form buttonValue="Criar conta" isCreate={true} onClick={(e) => handleSubmit(e)}>
       <Input 
         label="Seu nome completo:" 
         id="name" 

@@ -3,6 +3,7 @@ import Form from '../../components/Form/Form';
 import Input from '../../components/Input/Input';
 import PasswordInput from '../../components/Input/PasswordInput';
 import { AuthContext } from '../../contexts/AuthContext';
+import axios from 'axios';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -28,22 +29,24 @@ const Login: React.FC = () => {
     try {
       await login({ email, password });
     } catch (err: unknown) {
-
-      if (err instanceof Error) {
-  
-        if (err.message === 'Unauthorized') {
-          setError("Credenciais inválidas. Verifique o e-mail e a senha e tente novamente.");
+      if(axios.isAxiosError(err)) {
+        if (err.response) {
+          if (err.response.status === 400) {
+            setError("Credenciais inválidas. Verifique o e-mail e a senha e tente novamente.");
+          } else {
+            setError("Ocorreu um problema. Tente novamente mais tarde.");
+          }
         } else {
-          setError("Ocorreu um problema. Tente novamente mais tarde.");
+          setError("Erro de conexão. Verifique sua internet e tente novamente.");
         }
       } else {
         setError("Ocorreu um problema desconhecido. Tente novamente mais tarde.");
       }
-    }
+      }
   };
 
   return (
-    <Form buttonValue="Criar conta" onClick={(e) => handleSubmit(e)}>
+    <Form buttonValue="Login" isLogin={true} onClick={(e) => handleSubmit(e)}>
       <Input
         label="E-mail:"
         id="email"
