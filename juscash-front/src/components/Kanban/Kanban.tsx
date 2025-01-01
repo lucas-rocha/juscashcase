@@ -2,6 +2,9 @@ import React from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { timeSinceUpdate } from '../../utils/KanbanUtils'
 import './kanban.css';
+import { LuClock4 } from "react-icons/lu";
+import { IoIosCalendar } from "react-icons/io";
+
 import { api } from "../../services/api";
 
 type Task = {
@@ -140,9 +143,9 @@ const Kanban: React.FC<KanbanProps> = ({ data, setKanbanData }) => {
                           }}
                         >
                           <p>{task.processNumber}</p>
-                          <div>
-                            <p>{task.authors}</p>
-                            <p>{timeSinceUpdate(task.updatedAt)}</p>
+                          <div className="kanban__status">
+                            <span><LuClock4 color="#80929a" />{timeSinceUpdate(task.updatedAt)}</span>
+                            <span><IoIosCalendar color="#80929a" />01/01/2025</span>
                           </div>
                         </div>
                       )}

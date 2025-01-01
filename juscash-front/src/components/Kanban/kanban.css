@@ -19,4 +19,18 @@
 
 .kanban__body {
   padding: .6rem;
+  color: var(--kanban-color);
+}
+
+.kanban__status {
+  display: flex;
+  gap: 1rem;
+
+  margin-top: .5rem;
+}
+
+.kanban__status > span {
+  display: flex;
+  gap: .4rem;
+  align-items: center;
 }
