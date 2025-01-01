@@ -89,6 +89,7 @@
   height: 31px;
   background-color: var(--secondary-color);
   border: none;
+  cursor: pointer;
 }
 
 .kanban-filter__button > img {

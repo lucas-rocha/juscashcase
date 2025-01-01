@@ -1,5 +1,6 @@
 import React from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { timeSinceUpdate } from '../../utils/KanbanUtils'
 import './kanban.css';
 import { api } from "../../services/api";
 
@@ -8,6 +9,7 @@ type Task = {
   processNumber: string;
   authors: string;
   content: string;
+  updatedAt: string;
 };
 
 type Column = {
@@ -29,16 +31,15 @@ const Kanban: React.FC<KanbanProps> = ({ data, setKanbanData }) => {
 
   const onDragEnd = async (result: any) => {
     const { source, destination, draggableId } = result;
-
-    // Se não houver destino, significa que o item foi arrastado para fora da área
+  
     if (!destination) {
       console.log("Item arrastado para fora da área!");
       return;
     }
+  
     const sourceColumn = data[source.droppableId];
     const destColumn = data[destination.droppableId];
-
-    // Validação de movimentação reversa
+  
     if (
       (sourceColumn.id === "enviada_adv" && destColumn.id !== "lida") || 
       (sourceColumn.id === "lida" && destColumn.id !== "enviada_adv" && destColumn.id !== "concluida") || 
@@ -47,31 +48,50 @@ const Kanban: React.FC<KanbanProps> = ({ data, setKanbanData }) => {
       alert("Movimento inválido!");
       return;
     }
-
-    // Copiar as tarefas das colunas de origem e destino para evitar mutação direta
-    const sourceTasks = [...sourceColumn.tasks]; // Evitar mutação
-    const [movedTask] = sourceTasks.splice(source.index, 1);  // Remove a tarefa da coluna de origem
-
-    const destTasks = [...destColumn.tasks]; // Evitar mutação
-    destTasks.splice(destination.index, 0, movedTask);  // Adiciona a tarefa na posição correta da coluna de destino
-
-    // Atualizar a data com as colunas atualizadas
+  
+    // Copiar as tarefas para evitar mutação direta
+    const sourceTasks = [...sourceColumn.tasks];
+    const [movedTask] = sourceTasks.splice(source.index, 1); // Remove a tarefa da coluna de origem
+  
+    const destTasks = [...destColumn.tasks];
+    destTasks.splice(destination.index, 0, movedTask); // Adiciona a tarefa na posição correta da coluna de destino
+  
     const updatedData = {
       ...data,
       [sourceColumn.id]: { ...sourceColumn, tasks: sourceTasks },
       [destColumn.id]: { ...destColumn, tasks: destTasks },
     };
-
-    // Atualizar o estado do kanban no componente pai (Dashboard)
+  
+    // Atualizar frontend imediatamente
     setKanbanData(updatedData);
-
-    // Atualizar o status no backend
+  
     try {
-      await api.put(`/publications/${draggableId}`, { status: destColumn.id });
+      // Atualizar o status no backend e pegar a nova data
+      const response = await api.put(`/publications/${draggableId}`, { status: destColumn.id });
+  
+      // Atualiza o updatedAt com o novo valor do backend
+      const updatedTask = {
+        ...movedTask,
+        updatedAt: response.data.updatedAt, // Atualiza com a nova data
+      };
+  
+      const updatedDestTasks = [...destColumn.tasks];
+      updatedDestTasks[destination.index] = updatedTask; // Atualiza a tarefa na coluna de destino
+  
+      const finalData = {
+        ...updatedData,
+        [destColumn.id]: { ...destColumn, tasks: updatedDestTasks },
+      };
+  
+      // Atualiza o estado final após a resposta do backend
+      setKanbanData(finalData); 
+  
     } catch (error) {
       console.error("Erro ao atualizar status:", error);
     }
   };
+  
+  
 
   return (
     <div style={{ display: "flex", gap: "20px", padding: "20px", justifyContent: "space-between" }}>
@@ -83,13 +103,25 @@ const Kanban: React.FC<KanbanProps> = ({ data, setKanbanData }) => {
                 ref={provided.innerRef}
                 {...provided.droppableProps}
                 style={{
-                  backgroundColor: "#f4f4f4",
+                  backgroundColor: "#f1f3f4",
                   borderRadius: "5px",
                   flex: 1,
                   minHeight: "300px",
                 }}
               >
-                <h3 className="kanban__title">{column.title}</h3>
+                {column.title === 'Publicações Concluídas' ? (
+                  <>
+                    <h3 className="kanban__title kanban__title--finish">
+                      {column.title}
+                      <span>{column.tasks.length}</span>
+                    </h3>
+                  </>
+                ):
+                  <h3 className="kanban__title">
+                    {column.title}
+                    <span>{column.tasks.length}</span>
+                  </h3>
+                }
                 <div className="kanban__body">
                   {column.tasks.map((task, index) => (
                     <Draggable key={task.id} draggableId={task.id} index={index}>
@@ -107,9 +139,11 @@ const Kanban: React.FC<KanbanProps> = ({ data, setKanbanData }) => {
                             ...provided.draggableProps.style,
                           }}
                         >
-                          <p><strong>Processo:</strong> {task.processNumber}</p>
-                          <p><strong>Autor(es):</strong> {task.authors}</p>
-                          <p><strong>Conteúdo:</strong> {task.content}</p>
+                          <p>{task.processNumber}</p>
+                          <div>
+                            <p>{task.authors}</p>
+                            <p>{timeSinceUpdate(task.updatedAt)}</p>
+                          </div>
                         </div>
                       )}
                     </Draggable>
