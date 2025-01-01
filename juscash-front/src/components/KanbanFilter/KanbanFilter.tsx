@@ -26,6 +26,7 @@ const KanbanFilter: React.FC<KanbanFilterProps> = ({ filters, onFilterChange, on
             id="search"
             value={filters.search}
             onChange={(e) => onFilterChange('search', e.target.value)}
+            placeholder="Digite o número do processo ou nome das partes envolvidas"
           />
         </div>
 
@@ -46,7 +47,9 @@ const KanbanFilter: React.FC<KanbanFilterProps> = ({ filters, onFilterChange, on
               value={filters.endDate}
               onChange={(e) => onFilterChange('endDate', e.target.value)}
             />
-            <button type="button" onClick={onFilterSubmit}>ok</button>
+            <button type="button" className="kanban-filter__button" onClick={onFilterSubmit}>
+              <img src="./assets/search-icon.png" alt="Buscar" />
+            </button>
           </div>
         </div>
       </div>
