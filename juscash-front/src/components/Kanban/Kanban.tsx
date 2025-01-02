@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { timeSinceUpdate } from '../../utils/KanbanUtils'
 import './kanban.css';
@@ -27,10 +27,11 @@ type KanbanBoard = {
 
 type KanbanProps = {
   data: KanbanBoard; // Dados do Kanban passados como props
-  setKanbanData: React.Dispatch<React.SetStateAction<KanbanBoard>>; // Função para atualizar o estado
+  setKanbanData: React.Dispatch<React.SetStateAction<KanbanBoard>>;
+  onCardClick: (value: string) => void
 };
 
-const Kanban: React.FC<KanbanProps> = ({ data, setKanbanData }) => {
+const Kanban: React.FC<KanbanProps> = ({ data, setKanbanData, onCardClick }) => {
 
   const onDragEnd = async (result: any) => {
     const { source, destination, draggableId } = result;
@@ -93,8 +94,6 @@ const Kanban: React.FC<KanbanProps> = ({ data, setKanbanData }) => {
       console.error("Erro ao atualizar status:", error);
     }
   };
-  
-  
 
   return (
     <div style={{ display: "flex", gap: "20px", padding: "20px", justifyContent: "space-between" }}>
@@ -141,6 +140,7 @@ const Kanban: React.FC<KanbanProps> = ({ data, setKanbanData }) => {
                             boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
                             ...provided.draggableProps.style,
                           }}
+                          onClick={() => onCardClick(task.id)}
                         >
                           <p>{task.processNumber}</p>
                           <div className="kanban__status">

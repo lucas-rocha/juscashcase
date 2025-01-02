@@ -21,6 +21,8 @@ services:
       - "5555:5555"
     depends_on:
       - database
+    environment:
+      DATABASE_URL: postgresql://postgres:juscash2025@database:5432/juscash_db
     volumes:
     - ./juscash-api:/usr/src/app
     - /usr/src/app/node_modules

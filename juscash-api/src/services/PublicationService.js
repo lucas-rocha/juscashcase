@@ -28,6 +28,22 @@ class PublicationService {
     return publications;
   }
 
+  async getPublicationById(id) {
+    try {
+      const publication = await prisma.publications.findUnique({
+        where: { id },
+      });
+
+      if (!publication) {
+        throw new Error('Publicação não encontrada');
+      }
+
+      return publication;
+    } catch (error) {
+      throw new Error('Erro ao buscar a publicação: ' + error.message);
+    }
+  }
+
   async updatePublicationStatus(id, status) {
     try {
       const updatedPublication = await prisma.publications.update({

@@ -53,6 +53,18 @@ class PublicationController {
     }
   }
   
+  async getPublicationsById(req, res) {
+    try {
+      const { id } = req.params;  // ID da publicação
+
+      // Usar o serviço para buscar a publicação pelo ID
+      const publication = await publicationService.getPublicationById(id);
+
+      res.status(200).json(publication);
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  }
 
   async updatePublicationStatus(req, res) {
     try {

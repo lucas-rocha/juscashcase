@@ -30,6 +30,7 @@ const router = express.Router()
 const publicationController = new PublicationController()
 
 router.get('/', publicationController.getPublications)
+router.get('/:id', publicationController.getPublicationsById)
 router.put('/:id', publicationController.updatePublicationStatus)
 
 

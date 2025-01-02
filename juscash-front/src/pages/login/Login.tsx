@@ -8,7 +8,7 @@ import axios from 'axios';
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null); // Para armazenar mensagens de erro
+  const [error, setError] = useState<string | null>(null);
   const { login } = useContext(AuthContext);
 
   const validateEmail = (email: string) => {
