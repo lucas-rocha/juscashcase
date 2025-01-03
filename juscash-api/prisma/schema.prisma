@@ -27,6 +27,7 @@ model Publications {
   processNumber     String
   authors           String
   lawyers           String
+  defendant         String
   content           String
   availabilityData  DateTime
   principalValue    Decimal

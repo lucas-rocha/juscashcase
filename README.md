@@ -51,7 +51,7 @@ Certifique-se de que seu ambiente atenda aos seguintes requisitos:
 ### Registro de usuário
 #### Requisição:
 ```bash
-POST /auth/login
+POST api/users
 Content-Type: application/json
 
 {
@@ -76,7 +76,7 @@ Content-Type: application/json
 ### Autenticação
 #### Requisição:
 ```bash
-POST /auth/login
+POST api/users/login
 Content-Type: application/json
 
 {
@@ -94,3 +94,124 @@ Content-Type: application/json
   }
 }
 ```
+
+
+### Busca todas as publicações
+#### Requisição:
+```bash
+GET api/publications
+Content-Type: application/json
+x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYjdjMDZlYzYtNTVkZi00ZDQ1LWFiMmYtNzEwN2M4ZGY0MzFmIiwiaWF0IjoxNzM1NjkwMDgyfQ.RFB-pqu5WmnYKaLQDMQiZkDu_F9ebIVX7A-605HqQq8
+```
+### Parâmetros de Query
+
+| Nome         | Tipo     | Obrigatório | Descrição                                                                 |
+|--------------|----------|-------------|---------------------------------------------------------------------------|
+| `search`     | String   | Não         | Texto para realizar a busca nas publicações. Se não informado, retorna todas as publicações. |
+| `dataInicio` | String   | Não         | Data de início para filtrar publicações, no formato `YYYY-MM-DD`. Se não informado, sem filtro de data. |
+| `dataFim`    | String   | Não         | Data de término para filtrar publicações, no formato `YYYY-MM-DD`. Se não informado, sem filtro de data. |
+| `offset`     | Integer  | Não         | Índice inicial para a paginação, padrão é `0`. Utilizado para buscar publicações a partir de uma posição específica. |
+| `limit`      | Integer  | Não         | Limite de publicações por página, padrão é `30`. Controla o número de publicações retornadas. |
+
+
+#### Resposta:
+```json
+{
+  "nova": {
+    "title": "Publicações novas",
+    "id": "nova",
+    "tasks": [
+      {
+        "id": "123",
+        "processNumber": "000123456789",
+        "authors": "Autor Exemplo",
+        "content": "Conteúdo da publicação.",
+        "updatedAt": "2025-01-02T12:00:00Z"
+      }
+    ]
+  },
+  "lida": {
+    "title": "Publicações Lidas",
+    "id": "lida",
+    "tasks": []
+  },
+  "enviada_adv": {
+    "title": "Publicações Enviadas para o Advogado",
+    "id": "enviada_adv",
+    "tasks": []
+  },
+  "concluida": {
+    "title": "Publicações Concluídas",
+    "id": "concluida",
+    "tasks": []
+  }
+}
+```
+
+## Busca Publicação por ID
+
+### Descrição
+Este endpoint permite buscar uma publicação específica com base no seu ID.
+
+### URL
+```bash
+GET /api/publications/:id
+x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYjdjMDZlYzYtNTVkZi00ZDQ1LWFiMmYtNzEwN2M4ZGY0MzFmIiwiaWF0IjoxNzM1NjkwMDgyfQ.RFB-pqu5WmnYKaLQDMQiZkDu_F9ebIVX7A-605HqQq8
+```
+
+### Parâmetros de Path
+
+| Nome   | Tipo   | Obrigatório | Descrição                       |
+|--------|--------|-------------|---------------------------------|
+| `id`   | String | Sim         | ID da publicação que será buscada. |
+
+### Resposta
+
+#### Exemplo de Resposta Sucesso (200)
+```json
+{
+  "id": "123",
+  "processNumber": "000123456789",
+  "authors": "Autor Exemplo",
+  "content": "Conteúdo da publicação.",
+  "status": "nova",
+  "updatedAt": "2025-01-02T12:00:00Z"
+}
+```
+
+## Atualizar Status da Publicação
+
+### Descrição
+Este endpoint permite atualizar o status de uma publicação específica com base no seu ID.
+
+### URL
+```bash
+PUT /api/publications/:id
+x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYjdjMDZlYzYtNTVkZi00ZDQ1LWFiMmYtNzEwN2M4ZGY0MzFmIiwiaWF0IjoxNzM1NjkwMDgyfQ.RFB-pqu5WmnYKaLQDMQiZkDu_F9ebIVX7A-605HqQq8
+```
+
+### Parâmetros de Path
+
+| Nome   | Tipo   | Obrigatório | Descrição                       |
+|--------|--------|-------------|---------------------------------|
+| `id`   | String | Sim         | ID da publicação que será atualizada. |
+
+### Corpo da Requisição
+
+| Nome    | Tipo   | Obrigatório | Descrição                           |
+|---------|--------|-------------|-------------------------------------|
+| `status`| String | Sim         | Novo status da publicação. Os valores válidos são: `nova`, `lida`, `enviada_adv`, `concluida`. |
+
+### Resposta
+
+#### Exemplo de Resposta Sucesso (200)
+```json
+{
+  "id": "123",
+  "processNumber": "000123456789",
+  "authors": "Autor Exemplo",
+  "content": "Conteúdo da publicação.",
+  "status": "lida",
+  "updatedAt": "2025-01-02T12:00:00Z"
+}
+

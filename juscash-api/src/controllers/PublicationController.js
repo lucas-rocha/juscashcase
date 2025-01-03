@@ -38,7 +38,6 @@ class PublicationController {
         lida: "Publicações Lidas",
         enviada_adv: "Publicações Enviadas para o Advogado",
         concluida: "Publicações Concluídas",
-        unknown: "Publicações Desconhecidas", // Adicionado status 'unknown' para evitar erro
       };
   
       // Inicializar o agrupamento com todas as colunas, garantindo que todos os status tenham a propriedade 'tasks'
@@ -53,18 +52,9 @@ class PublicationController {
   
       // Agrupar publicações por status
       publications.forEach((pub) => {
-        const status = pub.status || "unknown"; // Use 'unknown' se o status estiver vazio ou indefinido
+        const status = pub.status;
         if (groupedPublications[status]) {
           groupedPublications[status].tasks.push({
-            id: pub.id,
-            processNumber: pub.processNumber,
-            authors: pub.authors,
-            content: pub.content,
-            updatedAt: pub.updatedAt,
-          });
-        } else {
-          // Caso o status não esteja no mapeamento, adicione a publicação no status 'unknown'
-          groupedPublications["unknown"].tasks.push({
             id: pub.id,
             processNumber: pub.processNumber,
             authors: pub.authors,
@@ -79,9 +69,7 @@ class PublicationController {
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
-  }
-  
-  
+  }  
   
   async getPublicationsById(req, res) {
     try {

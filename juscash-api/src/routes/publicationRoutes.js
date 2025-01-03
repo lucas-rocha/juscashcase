@@ -190,7 +190,7 @@ const router = express.Router()
 
 const publicationController = new PublicationController()
 
-router.get('/', publicationController.getPublications)
+router.get('/', authMiddleware, publicationController.getPublications)
 router.get('/:id', authMiddleware, publicationController.getPublicationsById)
 router.put('/:id', authMiddleware, publicationController.updatePublicationStatus)
 

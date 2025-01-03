@@ -4,18 +4,20 @@ type CardModalProps = {
   onClose: () => void;
   taskDetails: {
     processNumber: string;
-    publicationDate: string;
+    availabilityData: string;
     authors: string[];
     defendants: string[];
     lawyers: string[];
-    grossValue: string;
     interestValue: string;
+    principalValue: string;
     attorneyFees: string;
     content: string;
   } | null;
 };
 
-const CardModal: React.FC<CardModalProps> = ({ onClose }) => {
+const CardModal: React.FC<CardModalProps> = ({ onClose, taskDetails }) => {
+  const date = new Date(taskDetails?.availabilityData || '');
+  const formattedDate = date.toLocaleDateString('pt-BR');
 
   return (
     <div className="modal-overlay">
@@ -26,60 +28,52 @@ const CardModal: React.FC<CardModalProps> = ({ onClose }) => {
         </button>
 
         <div className="content-section">
-          <h2 className="title">Publicação -</h2>
+          <h2 className="title">Publicação - {taskDetails?.processNumber}</h2>
           <p className="text">
             Data de publicação no DJE:<br />
+            {formattedDate}
           </p>
         </div>
 
         <div className="content-section">
           <h3 className="subtitle">Autor:</h3>
           <ul className="list">
-            {/* {taskDetails.authors.map((author, index) => (
-              <li key={index}>{author}</li>
-            ))} */}
-            alsdlsd
+            {taskDetails?.authors}
           </ul>
         </div>
 
         <div className="content-section">
           <h3 className="subtitle">Réu:</h3>
           <ul className="list">
-            {/* {taskDetails.defendants.map((defendant, index) => (
-              <li key={index}>{defendant}</li>
-            ))} */}
-            asçdksad
+            Ainda não tem
           </ul>
         </div>
 
         <div className="content-section">
           <h3 className="subtitle">Advogado(os):</h3>
           <ul className="list">
-            {/* {taskDetails.lawyers.map((lawyer, index) => (
-              <li key={index}>{lawyer}</li>
-            ))} */}
-            askdçlaskd
+          {taskDetails?.lawyers}
           </ul>
         </div>
 
         <div className="content-section">
           <h3 className="subtitle">Valor principal bruto/líquido</h3>
-          <p className="text">asd</p>
+          <p className="text">{taskDetails?.principalValue}</p>
         </div>
 
         <div className="content-section">
           <h3 className="subtitle">Valor dos juros moratórios:</h3>
-          <p className="text">ad</p>
+          <p className="text">{taskDetails?.interestValue}</p>
         </div>
 
         <div className="content-section">
           <h3 className="subtitle">Valor dos honorários advocatícios:</h3>
-          <p className="text">asdasd</p>
+          <p className="text">{taskDetails?.attorneyFees}</p>
         </div>
 
         <div className="content-section">
           <h3 className="subtitle">Conteúdo da Publicação:</h3>
-          <p className="text">asdsdasd</p>
+          <p className="text">{taskDetails?.content}</p>
         </div>
       </div>
     </div>

@@ -1,4 +1,6 @@
 from datetime import datetime
+import re
+
 
 # Regex for Date of Availability
 REGEX_DATE_AVAILABILITY = re.compile(
@@ -20,6 +22,7 @@ BASE_URL_PDF = 'https://dje.tjsp.jus.br/cdje/getPaginaDoDiario.do'
 OUTPUT_DIR_PDF = "./pdf"
 
 URL_CONSULTA = 'https://dje.tjsp.jus.br/cdje/consultaAvancada.do'
+URL_TROCA = 'https://dje.tjsp.jus.br/cdje/trocaDePagina.do'
 HEADERS_CONSULTA = {
   'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
   'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7',
@@ -52,4 +55,4 @@ HEADERS_CONSULTA_SEGUINTE = {
 
 data_atual = datetime.now().strftime('%d%%2F%m%%2F%Y')
 
-PARAMS_CONSULTA = f'dadosConsulta.dtInicio=13%2F11%2F2024&dadosConsulta.dtFim=13%2F11%2F2024&dadosConsulta.cdCaderno=12&dadosConsulta.pesquisaLivre=%22RPV%22+e+%22pagamento+pelo+INSS%22&pagina='
+PARAMS_CONSULTA = f'dadosConsulta.dtInicio=19%2F12%2F2024&dadosConsulta.dtFim=19%2F12%2F2024&dadosConsulta.cdCaderno=12&dadosConsulta.pesquisaLivre=%22RPV%22+e+%22pagamento+pelo+INSS%22&pagina='

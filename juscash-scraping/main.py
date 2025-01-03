@@ -4,9 +4,13 @@ import os
 import pdfplumber
 import datetime
 import locale
+import schedule
+import time
+import logging
+from populate_db import populate_publications
 from decimal import Decimal
 from bs4 import BeautifulSoup
-from config import REGEX_DATE_AVAILABILITY, REGEX_PLAINTIFFS, REGEX_LAWYERS, REGEX_INSTALLMENTS, END_OF_LINE, URL_CONSULTA, HEADERS_CONSULTA, BASE_URL_PDF, OUTPUT_DIR_PDF, PARAMS_CONSULTA
+from config import REGEX_DATE_AVAILABILITY, REGEX_PLAINTIFFS, REGEX_LAWYERS, REGEX_INSTALLMENTS, END_OF_LINE, URL_CONSULTA, HEADERS_CONSULTA, HEADERS_CONSULTA_SEGUINTE, BASE_URL_PDF, OUTPUT_DIR_PDF, PARAMS_CONSULTA, HEADERS_CONSULTA_SEGUINTE, URL_TROCA
 
 
 file_path = 'pdf/documento_1.pdf'
@@ -159,20 +163,8 @@ def download_pdf(pdf_url, save_path, session):
     except requests.exceptions.RequestException as e:
         print(f"Erro ao baixar PDF: {e}")
 
-def run_scraping():
-  if not os.path.exists(OUTPUT_DIR_PDF):
-        os.makedirs(OUTPUT_DIR_PDF)
-        print(f"Diretório criado: {OUTPUT_DIR_PDF}")
-
-  session = requests.Session()
-  unique_pdf_urls = set()
-  pdf_count = [1]
-
-  try:
-    response = session.post(URL_CONSULTA, headers=HEADERS_CONSULTA, data=PARAMS_CONSULTA)
-    response.raise_for_status()
-
-    popup_links = re.findall(r"popup\('(/cdje/consultaSimples\.do\?.+?)'\)", response.text)
+def fetch_pdfs_from_page(response_text, session, unique_pdf_urls, pdf_count):
+    popup_links = re.findall(r"popup\('(/cdje/consultaSimples\.do\?.+?)'\)", response_text)
     print(f"Encontrados {len(popup_links)} links de PDFs na página.")
 
     for relative_url in popup_links:
@@ -185,10 +177,72 @@ def run_scraping():
               pdf_name = os.path.join(OUTPUT_DIR_PDF, f"documento_{pdf_count[0]}.pdf")
               download_pdf(pdf_url, pdf_name, session)
               pdf_count[0] += 1
-          print(pdf_url)
+
+def run_scraping():
+  if not os.path.exists(OUTPUT_DIR_PDF):
+        os.makedirs(OUTPUT_DIR_PDF)
+        print(f"Diretório criado: {OUTPUT_DIR_PDF}")
+
+  session = requests.Session()
+  unique_pdf_urls = set()
+  pdf_count = [1]
+
+  try:
+    response = session.post(URL_CONSULTA, headers=HEADERS_CONSULTA, data=PARAMS_CONSULTA)
+    response.raise_for_status()
+    fetch_pdfs_from_page(response.text, session, unique_pdf_urls, pdf_count)
+
+    page_number = 2
+    while True:
+        print(f"Fazendo requisição para a página {page_number}...")
+        troca_data = f'pagina={page_number}&_='
+
+        cookies_str = '; '.join([f"{key}={value}" for key, value in session.cookies.get_dict().items()])
+        HEADERS_CONSULTA_SEGUINTE['Cookie'] = cookies_str
+
+        troca_response = session.post(URL_TROCA, headers=HEADERS_CONSULTA_SEGUINTE, data=troca_data)
+        troca_response.raise_for_status()
+
+        previous_count = len(unique_pdf_urls)
+        fetch_pdfs_from_page(troca_response.text, session, unique_pdf_urls, pdf_count)
+
+        if len(unique_pdf_urls) == previous_count:
+            print("Nenhum novo PDF encontrado, finalizando.")
+            break
+
+        page_number += 1
+
+    print("Scraping concluído com sucesso!")
   except requests.exceptions.RequestException as e:
-    print(f"Erro na requisição: {e}")
+    print(f"Erro ao baixar PDF: {e}")
 
 # run_scraping()
 # extract_info_pdf(file_path)
-process_all_pdfs()
+# process_all_pdfs()
+
+logging.basicConfig(filename='job.log', level=logging.INFO)    
+
+def run_job():
+    logging.info("Iniciando tarefa de populações no banco de dados...")
+    
+    populate_publications()
+    
+    logging.info("Tarefa de populações concluída.")
+
+def start_scheduler():
+    """Inicia o agendador para rodar o job diariamente."""
+    logging.info("Agendador iniciado. Job configurado para rodar diariamente às 02:00...")
+    schedule.every().day.at("13:20").do(run_job)  # Altere o horário conforme necessário
+
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+
+if __name__ == "__main__":
+    logging.info("Aplicação iniciada.")
+    
+    # Rodar o job imediatamente ao iniciar
+    run_job()
+
+    # Iniciar o agendador para execução diária
+    # start_scheduler()
