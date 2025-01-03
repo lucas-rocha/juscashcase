@@ -7,28 +7,50 @@ import locale
 import schedule
 import time
 import logging
-from populate_db import populate_publications
+import sys
+import datetime
+from populate_db import populate_publications, create_publications_table
 from decimal import Decimal
 from bs4 import BeautifulSoup
-from config import REGEX_DATE_AVAILABILITY, REGEX_PLAINTIFFS, REGEX_LAWYERS, REGEX_INSTALLMENTS, END_OF_LINE, URL_CONSULTA, HEADERS_CONSULTA, HEADERS_CONSULTA_SEGUINTE, BASE_URL_PDF, OUTPUT_DIR_PDF, PARAMS_CONSULTA, HEADERS_CONSULTA_SEGUINTE, URL_TROCA
+from config import REGEX_DATE_AVAILABILITY, REGEX_PLAINTIFFS, REGEX_LAWYERS, REGEX_INSTALLMENTS, REGEX_CASE_NUMBER, END_OF_LINE, URL_CONSULTA, HEADERS_CONSULTA, HEADERS_CONSULTA_SEGUINTE, BASE_URL_PDF, OUTPUT_DIR_PDF, PARAMS_CONSULTA, HEADERS_CONSULTA_SEGUINTE, URL_TROCA
 
+MESES = {
+    "janeiro": 1,
+    "fevereiro": 2,
+    "março": 3,
+    "abril": 4,
+    "maio": 5,
+    "junho": 6,
+    "julho": 7,
+    "agosto": 8,
+    "setembro": 9,
+    "outubro": 10,
+    "novembro": 11,
+    "dezembro": 12,
+}
 
 file_path = 'pdf/documento_1.pdf'
 
 def converter_data(data_texto):
-    # Defina o idioma do sistema para português para lidar com os meses em português
-    locale.setlocale(locale.LC_TIME, 'pt_BR.UTF-8')  # Isso pode precisar ser ajustado dependendo do sistema operacional
-
+    """Converte uma data em texto para datetime.date."""
+    if not data_texto:
+        return None
     try:
-        # Converte a data para o formato 'yyyy-mm-dd'
-        data = datetime.datetime.strptime(data_texto, '%A, %d de %B de %Y')
-        return data.strftime('%Y-%m-%d')
-    except ValueError as e:
-        print(f"Erro ao converter data: {e}")
+        # Remove o dia da semana e separa os componentes
+        partes = data_texto.split(",")[1].strip()  # Ex: "18 de dezembro de 2024"
+        dia, mes_texto, ano = partes.split(" de ")
+
+        # Converte os componentes para valores numéricos
+        dia = int(dia)
+        mes = MESES[mes_texto.lower()]
+        ano = int(ano)
+
+        # Retorna um objeto datetime.date
+        return datetime.date(ano, mes, dia)
+    except (KeyError, ValueError, IndexError):
         return None
 
 def converter_valor(valor_str):
-    """Converte valor monetário em Decimal."""
     try:
         if not valor_str:
             return None
@@ -77,15 +99,15 @@ def extract_info_pdf(file_path):
     for paragrafo in paragrafos:
         m_proc = REGEX_CASE_NUMBER.search(paragrafo)
         numero_processo = m_proc.group(1) if m_proc else None
-        print(f"\nNúmero do processo extraído: {numero_processo}")
+        # print(f"\nNúmero do processo extraído: {numero_processo}")
 
         m_autores = REGEX_PLAINTIFFS.search(paragrafo)
         autores = m_autores.group(1).strip() if m_autores else None
-        print(f"Autores extraídos: {autores}")
+        # print(f"Autores extraídos: {autores}")
 
         m_adv = REGEX_LAWYERS.search(paragrafo)
         advogados = m_adv.group(1).strip() if m_adv else None
-        print(f"Advogados extraídos: {advogados}")
+        # print(f"Advogados extraídos: {advogados}")
 
         valor_bruto = None
         valor_juros = None
@@ -107,28 +129,27 @@ def extract_info_pdf(file_path):
             elif 'honorário' in desc_lower:
                 valor_honorarios = val
 
-        print(f"Valor bruto: {valor_bruto}")
-        print(f"Valor de juros moratórios: {valor_juros}")
-        print(f"Honorários advocatícios: {valor_honorarios}")
+        # print(f"Valor bruto: {valor_bruto}")
+        # print(f"Valor de juros moratórios: {valor_juros}")
+        # print(f"Honorários advocatícios: {valor_honorarios}")
     
     # Converter valores
         valor_bruto = converter_valor(valor_bruto)
         valor_juros = converter_valor(valor_juros)
         valor_honorarios = converter_valor(valor_honorarios)
 
-        print(f"Valores convertidos - Bruto: {valor_bruto}, Juros: {valor_juros}, Honorários: {valor_honorarios}")
+        # print(f"Valores convertidos - Bruto: {valor_bruto}, Juros: {valor_juros}, Honorários: {valor_honorarios}")
 
         results.append((
-            os.path.basename(file_path),
-            data_disponibilizacao,
             numero_processo,
             autores,
             advogados,
+            "Instituto Nacional do Seguro Social - INSS",
+            paragrafo,
+            data_disponibilizacao,
             valor_bruto,
             valor_juros,
             valor_honorarios,
-            paragrafo,
-            "Instituto Nacional do Seguro Social - INSS",
             "nova",
         ))
 
@@ -136,7 +157,6 @@ def extract_info_pdf(file_path):
 
     
 def process_all_pdfs():
-    """Processa todos os PDFs no diretório especificado."""
     all_results = []
     for filename in os.listdir(OUTPUT_DIR_PDF):
         if filename.lower().endswith(".pdf"):
@@ -145,6 +165,7 @@ def process_all_pdfs():
             results = extract_info_pdf(file_path)
             all_results.extend(results)
     # insert_documents(all_results)
+    populate_publications(all_results)
     print("Todos os PDFs foram processados.")
     print(all_results)
 
@@ -219,30 +240,46 @@ def run_scraping():
 # run_scraping()
 # extract_info_pdf(file_path)
 # process_all_pdfs()
-
+data = [
+    ("123456", "Autor 1", "Advogado 1", "Teste agora", "Conteúdo de exemplo", "2025-01-01", 1000, 50, 100, "Em andamento"),
+    ("654321", "Autor 2", "Advogado 2", "Teste agora", "Outro conteúdo", "2025-02-01", 2000, 75, 150, "Concluído")
+]
 logging.basicConfig(filename='job.log', level=logging.INFO)    
 
 def run_job():
     logging.info("Iniciando tarefa de populações no banco de dados...")
     
-    populate_publications()
+    populate_publications(data)
     
     logging.info("Tarefa de populações concluída.")
 
-def start_scheduler():
-    """Inicia o agendador para rodar o job diariamente."""
-    logging.info("Agendador iniciado. Job configurado para rodar diariamente às 02:00...")
-    schedule.every().day.at("13:20").do(run_job)  # Altere o horário conforme necessário
+# def start_scheduler():
+#     """Inicia o agendador para rodar o job diariamente."""
+#     logging.info("Agendador iniciado. Job configurado para rodar diariamente às 02:00...")
+#     schedule.every().day.at("19:06").do(run_job)  # Altere o horário conforme necessário
 
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
+#     while True:
+#         schedule.run_pending()
+#         time.sleep(1)
+
+# if __name__ == "__main__":
+#     logging.info("Aplicação iniciada.")
+    
+#     # Rodar o job imediatamente ao iniciar
+#     # run_job()
+
+#     # Iniciar o agendador para execução diária
+#     start_scheduler()
 
 if __name__ == "__main__":
-    logging.info("Aplicação iniciada.")
-    
-    # Rodar o job imediatamente ao iniciar
-    run_job()
-
-    # Iniciar o agendador para execução diária
-    # start_scheduler()
+    try:
+        # Criar a tabela se não existir
+        create_publications_table()
+        run_scraping()
+        process_all_pdfs()
+        # run_job()
+    except Exception as e:
+        print(f"Erro durante a execução: {e}")
+    finally:
+        print("Finalizando contêiner.")
+        sys.exit(0)

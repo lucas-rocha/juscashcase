@@ -1,14 +1,17 @@
-FROM python:3.10-slim
+FROM python:3.9-slim
+
+# Configurações de localidade
+ENV LANG=C.UTF-8
+ENV LC_ALL=C.UTF-8
 
 # Diretório de trabalho
 WORKDIR /app
 
-# Copiar o requirements.txt e instalar dependências
-COPY requirements.txt .  
+# Copiar os arquivos para o contêiner
+COPY . /app
+
+# Instalar dependências
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copiar o código fonte
-COPY . .
-
-# Comando padrão: executa o script
+# Comando para rodar o script
 CMD ["python", "main.py"]

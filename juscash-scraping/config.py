@@ -1,18 +1,12 @@
 from datetime import datetime
 import re
 
-
-# Regex for Date of Availability
 REGEX_DATE_AVAILABILITY = re.compile(
     r'(\b(?:segunda-feira|terça-feira|quarta-feira|quinta-feira|sexta-feira|sábado|domingo), \d{1,2} de \w+ de \d{4}\b)'
 )
-# Regex for Case Number
 REGEX_CASE_NUMBER = re.compile(r'Processo\s+(\S+)')
-# Regex for Plaintiffs (captures between hyphens)
 REGEX_PLAINTIFFS = re.compile(r'-\s*([^-]+?)\s*-\s*Vistos\.?(?:\s*1\))?')
-# Regex for Lawyers (more flexible)
 REGEX_LAWYERS = re.compile(r'ADV:\s*(.*?)(?=$|\n)')
-# Regex for Installments (captures monetary values and associated description)
 REGEX_INSTALLMENTS = re.compile(r'R\$[\s]*([\d.,-]+)\s*-\s*([a-zA-Z\s/çáéíóú]+);?', re.UNICODE)
 
 END_OF_LINE = "Publicação Oficial do Tribunal de Justiça do Estado de São Paulo - Lei Federal nº 11.419/06, art. 4º"

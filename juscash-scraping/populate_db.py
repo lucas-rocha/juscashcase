@@ -1,20 +1,23 @@
 import psycopg2
 import os
-from dotenv import load_dotenv
 from psycopg2.extras import execute_values
-load_dotenv()
 
-# Configurações do banco de dados
-DATABASE_URL = os.getenv("DATABASE_URL")
+DB_CONFIG = {
+    'host': 'juscash_database',
+    'port': 5432,
+    'database': 'juscash_db',
+    'user': 'postgres',
+    'password': 'juscash2025'
+}
 
 data = [
-    ("123456", "Autor 1", "Advogado 1", "Conteúdo de exemplo", "2025-01-01", 1000, 50, 100, "Em andamento"),
-    ("654321", "Autor 2", "Advogado 2", "Outro conteúdo", "2025-02-01", 2000, 75, 150, "Concluído")
+    ("123456", "Autor 1", "Advogado 1", "teste", "Conteúdo de exemplo", "2025-01-01", 1000, 50, 100, "Em andamento"),
+    ("654321", "Autor 2", "Advogado 2", "teste", "Outro conteúdo", "2025-02-01", 2000, 75, 150, "Concluído")
 ]
 
 # Função para conectar ao banco de dados
 def get_db_connection():
-    conn = psycopg2.connect(DATABASE_URL)
+    conn = psycopg2.connect(**DB_CONFIG)
     return conn
 
 # Função para criar a tabela, caso não exista
@@ -28,6 +31,7 @@ def create_publications_table():
                 processNumber TEXT NOT NULL UNIQUE,
                 authors TEXT,
                 lawyers TEXT,
+                defendant TEXT,
                 content TEXT,
                 availabilityData DATE,
                 principalValue NUMERIC(15, 2),
@@ -40,11 +44,9 @@ def create_publications_table():
             """)
             conn.commit()
 
-# Função para popular a tabela Publications
 def populate_publications(data_list):
-    """Insere múltiplos registros na tabela Publications."""
     query = """
-    INSERT INTO Publications (processNumber, authors, lawyers, content, availabilityData, 
+    INSERT INTO Publications (processNumber, authors, lawyers, defendant, content, availabilityData, 
                             principalValue, interestValue, attorneyFees, status)
     VALUES %s
     ON CONFLICT (processNumber) DO NOTHING;
@@ -53,9 +55,3 @@ def populate_publications(data_list):
         with conn.cursor() as cur:
             execute_values(cur, query, data_list)
             conn.commit()
-
-# Criar a tabela se não existir
-create_publications_table()
-
-# Popular a tabela com dados de exemplo
-populate_publications(data)
