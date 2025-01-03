@@ -7,11 +7,27 @@ class PublicationController {
     try {
       const { search, dataInicio, dataFim, offset = 0, limit = 30 } = req.query;
   
-      // Obtenha os dados do serviço
+      // Inicializa o objeto de filtros
+      const filters = {};
+  
+      // Verificar se a dataInicio e dataFim estão definidas e preparar a consulta
+      if (dataInicio) {
+        filters.dataInicio = new Date(dataInicio); // Converter para objeto Date
+      }
+      if (dataFim) {
+        filters.dataFim = new Date(dataFim); // Converter para objeto Date
+      }
+  
+      // Se search não for fornecido, ignore a pesquisa no filtro
+      if (search) {
+        filters.search = search;
+      }
+  
+      // Obtenha as publicações com base nos filtros, incluindo a pesquisa
       const publications = await publicationService.getPublications({
-        search,
-        dataInicio,
-        dataFim,
+        search: filters.search,
+        dataInicio: filters.dataInicio,
+        dataFim: filters.dataFim,
         offset: parseInt(offset, 10),
         limit: parseInt(limit, 10),
       });
@@ -21,10 +37,11 @@ class PublicationController {
         nova: "Publicações novas",
         lida: "Publicações Lidas",
         enviada_adv: "Publicações Enviadas para o Advogado",
-        concluida: "Publicações Concluídas"
+        concluida: "Publicações Concluídas",
+        unknown: "Publicações Desconhecidas", // Adicionado status 'unknown' para evitar erro
       };
   
-      // Inicializar o agrupamento com todas as colunas
+      // Inicializar o agrupamento com todas as colunas, garantindo que todos os status tenham a propriedade 'tasks'
       const groupedPublications = Object.keys(statusTitles).reduce((acc, status) => {
         acc[status] = {
           title: statusTitles[status],
@@ -36,14 +53,25 @@ class PublicationController {
   
       // Agrupar publicações por status
       publications.forEach((pub) => {
-        const status = pub.status || "unknown"; // Use 'unknown' se o status estiver vazio
-        groupedPublications[status].tasks.push({
-          id: pub.id,
-          processNumber: pub.processNumber,
-          authors: pub.authors,
-          content: pub.content,
-          updatedAt: pub.updatedAt
-        });
+        const status = pub.status || "unknown"; // Use 'unknown' se o status estiver vazio ou indefinido
+        if (groupedPublications[status]) {
+          groupedPublications[status].tasks.push({
+            id: pub.id,
+            processNumber: pub.processNumber,
+            authors: pub.authors,
+            content: pub.content,
+            updatedAt: pub.updatedAt,
+          });
+        } else {
+          // Caso o status não esteja no mapeamento, adicione a publicação no status 'unknown'
+          groupedPublications["unknown"].tasks.push({
+            id: pub.id,
+            processNumber: pub.processNumber,
+            authors: pub.authors,
+            content: pub.content,
+            updatedAt: pub.updatedAt,
+          });
+        }
       });
   
       // Retorne os dados agrupados
@@ -52,6 +80,8 @@ class PublicationController {
       res.status(400).json({ error: error.message });
     }
   }
+  
+  
   
   async getPublicationsById(req, res) {
     try {

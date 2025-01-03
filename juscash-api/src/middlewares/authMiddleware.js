@@ -1,4 +1,4 @@
-const AuthService = require('./services/AuthService');
+const AuthService = require('../services/AuthService');
 
 function authMiddleware(req, res, next) {
   try {

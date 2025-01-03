@@ -9,9 +9,9 @@ const app = express()
 const port = 5000
 
 app.use(cors({
-  origin: 'http://localhost:3000', // Substitua pelo domínio do seu front-end em produção
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Métodos permitidos
-  allowedHeaders: ['Content-Type', 'Authorization', 'x-access-token'], // Cabeçalhos permitidos
+  origin: 'http://localhost:3000',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-access-token'],
 }));
 
 app.use(express.json())

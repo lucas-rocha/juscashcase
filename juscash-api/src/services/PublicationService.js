@@ -9,16 +9,25 @@ class PublicationService {
         OR: [
           { authors: { contains: search, mode: "insensitive" } },
           { content: { contains: search, mode: "insensitive" } },
+          { processNumber: { contains: search, mode: "insensitive" } },
+          { lawyers: { contains: search, mode: "insensitive" } },
         ],
       }),
-      ...(dataInicio && dataFim && { 
-        createdAt: { 
-          gte: new Date(dataInicio), 
-          lte: new Date(dataFim) 
-        } 
+      ...(dataInicio && {
+        createdAt: { gte: new Date(dataInicio) }, // Se apenas dataInicio for fornecido
+      }),
+      ...(dataFim && {
+        createdAt: { lte: new Date(dataFim) }, // Se apenas dataFim for fornecido
+      }),
+      ...(dataInicio && dataFim && {
+        createdAt: {
+          gte: new Date(dataInicio),
+          lte: new Date(dataFim),
+        }, // Caso ambas as datas sejam fornecidas
       }),
     };
 
+    // Buscar as publicações com os filtros aplicados
     const publications = await prisma.publications.findMany({
       where,
       skip: offset,
