@@ -24,15 +24,15 @@ model User {
 
 model Publications {
   id                String      @id @default(uuid())
-  processNumber     String
+  processNumber     String      @unique
   authors           String
   lawyers           String
   defendant         String
   content           String
   availabilityData  DateTime
-  principalValue    Decimal
-  interestValue     Decimal
-  attorneyFees      Decimal
+  principalValue    Decimal     @db.Decimal(15, 2)
+  interestValue     Decimal     @db.Decimal(15, 2)
+  attorneyFees      Decimal     @db.Decimal(15, 2)
   status            String
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
