@@ -44,10 +44,14 @@ const Kanban: React.FC<KanbanProps> = ({ data, setKanbanData, onCardClick }) => 
     const sourceColumn = data[source.droppableId];
     const destColumn = data[destination.droppableId];
   
+    // Verificação das movimentações válidas
     if (
-      (sourceColumn.id === "enviada_adv" && destColumn.id !== "lida") || 
-      (sourceColumn.id === "lida" && destColumn.id !== "enviada_adv" && destColumn.id !== "concluida") || 
-      (destColumn.id === "concluida" && sourceColumn.id !== "enviada_adv")
+      (sourceColumn.id === "novas" && destColumn.id !== "lidas") ||
+      (sourceColumn.id === "lidas" && destColumn.id !== "enviada_adv") ||
+      (sourceColumn.id === "enviada_adv" &&
+        destColumn.id !== "lidas" &&
+        destColumn.id !== "concluida") ||
+      (sourceColumn.id === "concluida") // Publicações concluídas não podem ser movidas
     ) {
       alert("Movimento inválido!");
       return;
@@ -71,7 +75,9 @@ const Kanban: React.FC<KanbanProps> = ({ data, setKanbanData, onCardClick }) => 
   
     try {
       // Atualizar o status no backend e pegar a nova data
-      const response = await api.put(`/publications/${draggableId}`, { status: destColumn.id });
+      const response = await api.put(`/publications/${draggableId}`, {
+        status: destColumn.id,
+      });
   
       // Atualiza o updatedAt com o novo valor do backend
       const updatedTask = {
@@ -88,12 +94,12 @@ const Kanban: React.FC<KanbanProps> = ({ data, setKanbanData, onCardClick }) => 
       };
   
       // Atualiza o estado final após a resposta do backend
-      setKanbanData(finalData); 
-  
+      setKanbanData(finalData);
     } catch (error) {
       console.error("Erro ao atualizar status:", error);
     }
   };
+  
 
   return (
     <div style={{ display: "flex", gap: "20px", padding: "20px", justifyContent: "space-between" }}>

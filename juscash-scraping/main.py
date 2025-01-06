@@ -32,20 +32,16 @@ MESES = {
 file_path = 'pdf/documento_1.pdf'
 
 def converter_data(data_texto):
-    """Converte uma data em texto para datetime.date."""
     if not data_texto:
         return None
     try:
-        # Remove o dia da semana e separa os componentes
         partes = data_texto.split(",")[1].strip()  # Ex: "18 de dezembro de 2024"
         dia, mes_texto, ano = partes.split(" de ")
 
-        # Converte os componentes para valores numéricos
         dia = int(dia)
         mes = MESES[mes_texto.lower()]
         ano = int(ano)
 
-        # Retorna um objeto datetime.date
         return datetime.date(ano, mes, dia)
     except (KeyError, ValueError, IndexError):
         return None
@@ -70,7 +66,7 @@ def extract_info_pdf(file_path):
 
     if data_disponibilizacao_texto:
         data_disponibilizacao = converter_data(data_disponibilizacao_texto)
-        print(f"Data convertida: {data_disponibilizacao}")
+        # print(f"Data convertida: {data_disponibilizacao}")
     else:
         print("Data não encontrada.")
 
@@ -114,8 +110,8 @@ def extract_info_pdf(file_path):
         valor_honorarios = None
 
         parcelas = REGEX_INSTALLMENTS.findall(paragrafo)
-        print("\nParcelas encontradas:")
-        print(parcelas)
+        # print("\nParcelas encontradas:")
+        # print(parcelas)
 
         for val, desc in parcelas:
             val = val.strip()
@@ -129,16 +125,10 @@ def extract_info_pdf(file_path):
             elif 'honorário' in desc_lower:
                 valor_honorarios = val
 
-        # print(f"Valor bruto: {valor_bruto}")
-        # print(f"Valor de juros moratórios: {valor_juros}")
-        # print(f"Honorários advocatícios: {valor_honorarios}")
-    
-    # Converter valores
+       
         valor_bruto = converter_valor(valor_bruto)
         valor_juros = converter_valor(valor_juros)
         valor_honorarios = converter_valor(valor_honorarios)
-
-        # print(f"Valores convertidos - Bruto: {valor_bruto}, Juros: {valor_juros}, Honorários: {valor_honorarios}")
 
         results.append((
             numero_processo,
@@ -154,31 +144,30 @@ def extract_info_pdf(file_path):
         ))
 
     return results
-
     
 def process_all_pdfs():
     all_results = []
     for filename in os.listdir(OUTPUT_DIR_PDF):
         if filename.lower().endswith(".pdf"):
             file_path = os.path.join(OUTPUT_DIR_PDF, filename)
-            print(f"Processando arquivo: {file_path}")
             results = extract_info_pdf(file_path)
             all_results.extend(results)
     # insert_documents(all_results)
+    # populate_publications(all_results)
     populate_publications(all_results)
     print("Todos os PDFs foram processados.")
-    print(all_results)
+    # print(all_results)
 
 
 def download_pdf(pdf_url, save_path, session):
-    print(f"Baixando PDF de: {pdf_url}")
+    # print(f"Baixando PDF de: {pdf_url}")
     try:
         response = session.get(pdf_url, stream=True, timeout=30)
         if response.status_code == 200 and 'application/pdf' in response.headers.get('Content-Type', ''):
             with open(save_path, 'wb') as f:
                 for chunk in response.iter_content(1024):
                     f.write(chunk)
-            print(f"PDF salvo em: {save_path}")
+            # print(f"PDF salvo em: {save_path}")
         else:
             print(f"Falha ao baixar PDF. Status: {response.status_code}. Tipo: {response.headers.get('Content-Type')}")
     except requests.exceptions.RequestException as e:
@@ -215,7 +204,7 @@ def run_scraping():
 
     page_number = 2
     while True:
-        print(f"Fazendo requisição para a página {page_number}...")
+        # print(f"Fazendo requisição para a página {page_number}...")
         troca_data = f'pagina={page_number}&_='
 
         cookies_str = '; '.join([f"{key}={value}" for key, value in session.cookies.get_dict().items()])
@@ -237,15 +226,6 @@ def run_scraping():
   except requests.exceptions.RequestException as e:
     print(f"Erro ao baixar PDF: {e}")
 
-# run_scraping()
-# extract_info_pdf(file_path)
-# process_all_pdfs()
-data = [
-    ("123456", "Autor 1", "Advogado 1", "Teste agora", "Conteúdo de exemplo", "2025-01-01", 1000, 50, 100, "Em andamento"),
-    ("654321", "Autor 2", "Advogado 2", "Teste agora", "Outro conteúdo", "2025-02-01", 2000, 75, 150, "Concluído")
-]
-logging.basicConfig(filename='job.log', level=logging.INFO)    
-
 def run_job():
     logging.info("Iniciando tarefa de populações no banco de dados...")
     
@@ -253,28 +233,10 @@ def run_job():
     
     logging.info("Tarefa de populações concluída.")
 
-# def start_scheduler():
-#     """Inicia o agendador para rodar o job diariamente."""
-#     logging.info("Agendador iniciado. Job configurado para rodar diariamente às 02:00...")
-#     schedule.every().day.at("19:06").do(run_job)  # Altere o horário conforme necessário
-
-#     while True:
-#         schedule.run_pending()
-#         time.sleep(1)
-
-# if __name__ == "__main__":
-#     logging.info("Aplicação iniciada.")
-    
-#     # Rodar o job imediatamente ao iniciar
-#     # run_job()
-
-#     # Iniciar o agendador para execução diária
-#     start_scheduler()
-
 if __name__ == "__main__":
     try:
         # Criar a tabela se não existir
-        create_publications_table()
+        # create_publications_table()
         run_scraping()
         process_all_pdfs()
         # run_job()

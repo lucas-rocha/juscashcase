@@ -1,0 +1,8 @@
+-- AlterTable
+ALTER TABLE "Publications" ALTER COLUMN "content" DROP NOT NULL,
+ALTER COLUMN "principalValue" DROP NOT NULL,
+ALTER COLUMN "interestValue" DROP NOT NULL,
+ALTER COLUMN "attorneyFees" DROP NOT NULL,
+ALTER COLUMN "status" DROP NOT NULL,
+ALTER COLUMN "availabilityData" DROP NOT NULL,
+ALTER COLUMN "defendant" DROP NOT NULL;

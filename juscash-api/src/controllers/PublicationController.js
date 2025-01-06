@@ -58,7 +58,13 @@ class PublicationController {
             id: pub.id,
             processNumber: pub.processNumber,
             authors: pub.authors,
+            lawyers: pub.lawyers,
+            defendant: pub.defendant,
             content: pub.content,
+            availabilityData: pub.availabilityData,
+            principalValue: pub.principalValue,
+            interestValue: pub.interestValue,
+            attorneyFees: pub.attorneyFees,
             updatedAt: pub.updatedAt,
           });
         }

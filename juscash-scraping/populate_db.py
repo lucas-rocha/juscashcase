@@ -1,6 +1,9 @@
 import psycopg2
 import os
 from psycopg2.extras import execute_values
+import uuid
+from datetime import datetime
+
 
 DB_CONFIG = {
     'host': 'juscash_database',
@@ -11,8 +14,8 @@ DB_CONFIG = {
 }
 
 data = [
-    ("123456", "Autor 1", "Advogado 1", "teste", "Conteúdo de exemplo", "2025-01-01", 1000, 50, 100, "Em andamento"),
-    ("654321", "Autor 2", "Advogado 2", "teste", "Outro conteúdo", "2025-02-01", 2000, 75, 150, "Concluído")
+    ("1234565", "Autor 1s", "Advogado 1", "tes3te", "Conteú3do de exemplo", "2025-01-01", 1000, 50, 100, "Em andamento"),
+    ("6543213", "Autor 2", "Advogado 2", "te3ste", "Out3ro conteúdo", "2025-02-01", 2000, 75, 150, "Concluído")
 ]
 
 # Função para conectar ao banco de dados
@@ -45,13 +48,19 @@ def create_publications_table():
             conn.commit()
 
 def populate_publications(data_list):
+    print(data_list[0])
     query = """
-    INSERT INTO Publications (processNumber, authors, lawyers, defendant, content, availabilityData, 
-                            principalValue, interestValue, attorneyFees, status)
+    INSERT INTO "Publications" ("id", "processNumber", "authors", "lawyers", "defendant", "content", "availabilityData", "principalValue", "interestValue", "attorneyFees", "status", "updatedAt")
     VALUES %s
-    ON CONFLICT (processNumber) DO NOTHING;
+    ON CONFLICT ("processNumber") DO NOTHING;
     """
-    with get_db_connection() as conn:
-        with conn.cursor() as cur:
-            execute_values(cur, query, data_list)
-            conn.commit()
+    print(query)
+    data_list_with_ids = [(str(uuid.uuid4()),) + item + (datetime.now(),) for item in data_list]
+    try:
+        with get_db_connection() as conn:
+            with conn.cursor() as cur:
+                execute_values(cur, query, data_list_with_ids)
+                conn.commit()
+                print("Inserção concluída com sucesso!")
+    except Exception as e:
+        print(f"Erro ao inserir dados: {e}")

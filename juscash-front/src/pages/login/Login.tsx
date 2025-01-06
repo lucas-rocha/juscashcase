@@ -4,17 +4,13 @@ import Input from '../../components/Input/Input';
 import PasswordInput from '../../components/Input/PasswordInput';
 import { AuthContext } from '../../contexts/AuthContext';
 import axios from 'axios';
+import { validateEmail } from '../../utils/formValidate';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const { login } = useContext(AuthContext);
-
-  const validateEmail = (email: string) => {
-    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-    return emailRegex.test(email);
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

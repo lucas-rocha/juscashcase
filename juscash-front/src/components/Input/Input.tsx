@@ -16,7 +16,7 @@ const Input: React.FC<InputProps> = ({ label, id, type, value, onChange }) => {
         type="email"
         name="email"
         id={id}
-        required
+        required={true}
         value={value}
         onChange={onChange}
       />

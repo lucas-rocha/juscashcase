@@ -5,17 +5,37 @@ import PasswordInput from "../../components/Input/PasswordInput"
 import { api } from "../../services/api"
 import Swal from "sweetalert2"
 import { useNavigate } from "react-router-dom"
+import { validateEmail, validatePassword } from "../../utils/formValidate"
 
 const SignUp: React.FC = () => {
   const [fullname, setFullname] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [passwordConfirm, setPasswordConfirm] = useState('')
+  const [error, setError] = useState<string | null>(null);
 
   const navigate = useNavigate()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!validateEmail(email)) {
+      setError("Formato de e-mail inválido.");
+      return;
+    }
+
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+      setError(passwordError);
+      return;
+    }
+    
+    if (password !== passwordConfirm) {
+      setError("As senhas não correspondem.");
+      return;
+    }
+
+    setError(null);
   
     try {
       const response = await api.post('users', {
@@ -55,7 +75,7 @@ const SignUp: React.FC = () => {
         id="name" 
         type="text"
         value={fullname}
-        onChange={(e) => setFullname(e.target.value)} 
+        onChange={(e) => setFullname(e.target.value)}
       />
       <Input 
         label="E-mail:" 
@@ -64,6 +84,7 @@ const SignUp: React.FC = () => {
         value={email}
         onChange={(e) => setEmail(e.target.value)} 
       />
+      {error && error.includes("e-mail") && <p style={{ color: 'red' }}>{error}</p>}
       <PasswordInput 
         label="Senha" 
         id="password"
@@ -76,6 +97,7 @@ const SignUp: React.FC = () => {
         value={passwordConfirm}
         onChange={(e) => setPasswordConfirm(e.target.value)} 
       />
+      {error && !error.includes("e-mail") && <p style={{ color: 'red' }}>{error}</p>}
     </Form>
   )
 }

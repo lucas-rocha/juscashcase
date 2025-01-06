@@ -16,17 +16,17 @@ const Form: React.FC<FormProps> = ({ children, buttonValue, onClick, isLogin, is
         <img src="./assets/logo.png" alt="Logo da JusCash" />
       </div>
       
-      <form className="form">
+      <form className="form" onSubmit={onClick}>
         {children}
+
+        <button type="submit" className="login-button">
+          {buttonValue}
+        </button>
       </form>
 
       {isCreate && (
         <Link to="/login" className="signup-link">Já possui uma conta? Fazer o login</Link>
       )}
-
-      <button type="submit" className="login-button" onClick={onClick}>
-        {buttonValue}
-      </button>
 
       {isLogin && (
         <Link to="/criar-conta" className="signup-link">Nao possui uma conta? Cadastra-se</Link>
