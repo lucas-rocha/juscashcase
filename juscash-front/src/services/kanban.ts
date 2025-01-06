@@ -1,6 +1,6 @@
 import { api } from "./api";
 
-type CardFilter = {
+export type CardFilter = {
   search: string;
   startDate: string;
   endDate: string;
@@ -8,7 +8,7 @@ type CardFilter = {
   limit: number;
 };
 
-type Task = {
+export type Task = {
   id: string;
   processNumber: string;
   authors: string;
@@ -17,7 +17,7 @@ type Task = {
   defendant: string;
 };
 
-type KanbanResponse = {
+export type KanbanResponse = {
   data: {
     [key: string]: {
       title: string;

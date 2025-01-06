@@ -1,3 +1,4 @@
+import { formatDate } from '../../utils/KanbanUtils';
 import './cardModal.css'
 
 type CardModalProps = {
@@ -5,9 +6,9 @@ type CardModalProps = {
   taskDetails: {
     processNumber: string;
     availabilityData: string;
-    authors: string[];
-    defendants: string[];
-    lawyers: string[];
+    authors: string;
+    defendants: string;
+    lawyers: string;
     interestValue: string;
     principalValue: string;
     attorneyFees: string;
@@ -16,11 +17,16 @@ type CardModalProps = {
 };
 
 const CardModal: React.FC<CardModalProps> = ({ onClose, taskDetails }) => {
-  const date = new Date(taskDetails?.availabilityData || '');
-  const formattedDate = date.toLocaleDateString('pt-BR');
+  const showField = (value: string | undefined) => (value ? value : "N/A");
+
+  const handleOverlayClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
 
   return (
-    <div className="modal-overlay">
+    <div className="modal-overlay"  onClick={handleOverlayClick}>
       <div className="modal-content">
         <button className="close-button" onClick={onClose}>
           ✕
@@ -31,49 +37,49 @@ const CardModal: React.FC<CardModalProps> = ({ onClose, taskDetails }) => {
           <h2 className="title">Publicação - {taskDetails?.processNumber}</h2>
           <p className="text">
             Data de publicação no DJE:<br />
-            {formattedDate}
+            {formatDate(taskDetails?.availabilityData)}
           </p>
         </div>
 
         <div className="content-section">
           <h3 className="subtitle">Autor:</h3>
           <ul className="list">
-            {taskDetails?.authors}
+            {showField(taskDetails?.authors)}
           </ul>
         </div>
 
         <div className="content-section">
           <h3 className="subtitle">Réu:</h3>
           <ul className="list">
-            Ainda não tem
+            {showField(taskDetails?.defendants)}
           </ul>
         </div>
 
         <div className="content-section">
           <h3 className="subtitle">Advogado(os):</h3>
           <ul className="list">
-          {taskDetails?.lawyers}
+          {showField(taskDetails?.lawyers)}
           </ul>
         </div>
 
         <div className="content-section">
           <h3 className="subtitle">Valor principal bruto/líquido</h3>
-          <p className="text">{taskDetails?.principalValue}</p>
+          <p className="text">{showField(taskDetails?.principalValue)}</p>
         </div>
 
         <div className="content-section">
           <h3 className="subtitle">Valor dos juros moratórios:</h3>
-          <p className="text">{taskDetails?.interestValue}</p>
+          <p className="text">{showField(taskDetails?.interestValue)}</p>
         </div>
 
         <div className="content-section">
           <h3 className="subtitle">Valor dos honorários advocatícios:</h3>
-          <p className="text">{taskDetails?.attorneyFees}</p>
+          <p className="text">{showField(taskDetails?.attorneyFees)}</p>
         </div>
 
         <div className="content-section">
           <h3 className="subtitle">Conteúdo da Publicação:</h3>
-          <p className="text">{taskDetails?.content}</p>
+          <p className="text">{showField(taskDetails?.content)}</p>
         </div>
       </div>
     </div>

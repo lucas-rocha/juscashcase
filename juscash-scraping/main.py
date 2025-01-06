@@ -12,9 +12,9 @@ import datetime
 from populate_db import populate_publications, create_publications_table
 from decimal import Decimal
 from bs4 import BeautifulSoup
-from config import REGEX_DATE_AVAILABILITY, REGEX_PLAINTIFFS, REGEX_LAWYERS, REGEX_INSTALLMENTS, REGEX_CASE_NUMBER, END_OF_LINE, URL_CONSULTA, HEADERS_CONSULTA, HEADERS_CONSULTA_SEGUINTE, BASE_URL_PDF, OUTPUT_DIR_PDF, PARAMS_CONSULTA, HEADERS_CONSULTA_SEGUINTE, URL_TROCA
+from config import MONTHS, REGEX_DATE_AVAILABILITY, REGEX_PLAINTIFFS, REGEX_LAWYERS, REGEX_INSTALLMENTS, REGEX_CASE_NUMBER, END_OF_LINE, URL_CONSULTA, HEADERS_CONSULTA, HEADERS_CONSULTA_SEGUINTE, BASE_URL_PDF, OUTPUT_DIR_PDF, PARAMS_CONSULTA, HEADERS_CONSULTA_SEGUINTE, URL_TROCA
 
-MESES = {
+MONTHS = {
     "janeiro": 1,
     "fevereiro": 2,
     "março": 3,
@@ -29,29 +29,27 @@ MESES = {
     "dezembro": 12,
 }
 
-file_path = 'pdf/documento_1.pdf'
-
 def converter_data(data_texto):
     if not data_texto:
         return None
     try:
-        partes = data_texto.split(",")[1].strip()  # Ex: "18 de dezembro de 2024"
+        partes = data_texto.split(",")[1].strip()
         dia, mes_texto, ano = partes.split(" de ")
 
         dia = int(dia)
-        mes = MESES[mes_texto.lower()]
+        mes = MONTHS[mes_texto.lower()]
         ano = int(ano)
 
         return datetime.date(ano, mes, dia)
     except (KeyError, ValueError, IndexError):
         return None
 
-def converter_valor(valor_str):
+def converter_valor(string_value):
     try:
-        if not valor_str:
+        if not string_value:
             return None
-        valor_limpo = valor_str.strip().rstrip(',').replace('.', '').replace(',', '.')
-        return Decimal(valor_limpo)
+        new_value = string_value.strip().rstrip(',').replace('.', '').replace(',', '.')
+        return Decimal(new_value)
     except (InvalidOperation, ValueError):
         return None
 
@@ -61,17 +59,16 @@ def extract_info_pdf(file_path):
     with pdfplumber.open(file_path) as pdf:
         full_text = "\n".join([page.extract_text() for page in pdf.pages if page.extract_text()])
     
-    m_data = REGEX_DATE_AVAILABILITY.search(full_text)
-    data_disponibilizacao_texto = m_data.group(1).strip() if m_data else None
+    availability_data = REGEX_DATE_AVAILABILITY.search(full_text)
+    availability_data_txt = availability_data.group(1).strip() if availability_data else None
 
-    if data_disponibilizacao_texto:
-        data_disponibilizacao = converter_data(data_disponibilizacao_texto)
-        # print(f"Data convertida: {data_disponibilizacao}")
+    if availability_data_txt:
+        availability_data = converter_data(availability_data_txt)
     else:
         print("Data não encontrada.")
 
     lines = [l.strip() for l in full_text.split('\n')]
-    paragrafos = []
+    paragraphs = []
     current_paragraph = []
     capturing = False
 
@@ -90,28 +87,23 @@ def extract_info_pdf(file_path):
                 capturing = False
                 current_paragraph = []
                 if "rpv" in paragraph_text.lower() and "pagamento pelo inss" in paragraph_text.lower():
-                    paragrafos.append(paragraph_text)
+                    paragraphs.append(paragraph_text)
 
-    for paragrafo in paragrafos:
-        m_proc = REGEX_CASE_NUMBER.search(paragrafo)
-        numero_processo = m_proc.group(1) if m_proc else None
-        # print(f"\nNúmero do processo extraído: {numero_processo}")
+    for paragraph in paragraphs:
+        get_process = REGEX_CASE_NUMBER.search(paragraph)
+        process_number = get_process.group(1) if get_process else None
 
-        m_autores = REGEX_PLAINTIFFS.search(paragrafo)
-        autores = m_autores.group(1).strip() if m_autores else None
-        # print(f"Autores extraídos: {autores}")
+        get_authors = REGEX_PLAINTIFFS.search(paragraph)
+        authors = get_authors.group(1).strip() if get_authors else None
 
-        m_adv = REGEX_LAWYERS.search(paragrafo)
-        advogados = m_adv.group(1).strip() if m_adv else None
-        # print(f"Advogados extraídos: {advogados}")
+        get_lawyers = REGEX_LAWYERS.search(paragraph)
+        lawyers = get_lawyers.group(1).strip() if get_lawyers else None
 
-        valor_bruto = None
-        valor_juros = None
-        valor_honorarios = None
+        principal_value = None
+        interest_value = None
+        attorney_fees = None
 
-        parcelas = REGEX_INSTALLMENTS.findall(paragrafo)
-        # print("\nParcelas encontradas:")
-        # print(parcelas)
+        parcelas = REGEX_INSTALLMENTS.findall(paragraph)
 
         for val, desc in parcelas:
             val = val.strip()
@@ -119,27 +111,27 @@ def extract_info_pdf(file_path):
                 val = '0,00'
             desc_lower = desc.lower()
             if 'principal' in desc_lower:
-                valor_bruto = val
+                principal_value = val
             elif 'juros moratório' in desc_lower:
-                valor_juros = val
+                interest_value = val
             elif 'honorário' in desc_lower:
-                valor_honorarios = val
+                attorney_fees = val
 
        
-        valor_bruto = converter_valor(valor_bruto)
-        valor_juros = converter_valor(valor_juros)
-        valor_honorarios = converter_valor(valor_honorarios)
+        principal_value = converter_valor(principal_value)
+        interest_value = converter_valor(interest_value)
+        attorney_fees = converter_valor(attorney_fees)
 
         results.append((
-            numero_processo,
-            autores,
-            advogados,
+            process_number,
+            authors,
+            lawyers,
             "Instituto Nacional do Seguro Social - INSS",
-            paragrafo,
-            data_disponibilizacao,
-            valor_bruto,
-            valor_juros,
-            valor_honorarios,
+            paragraph,
+            availability_data,
+            principal_value,
+            interest_value,
+            attorney_fees,
             "nova",
         ))
 
@@ -152,22 +144,16 @@ def process_all_pdfs():
             file_path = os.path.join(OUTPUT_DIR_PDF, filename)
             results = extract_info_pdf(file_path)
             all_results.extend(results)
-    # insert_documents(all_results)
-    # populate_publications(all_results)
     populate_publications(all_results)
-    print("Todos os PDFs foram processados.")
-    # print(all_results)
 
 
 def download_pdf(pdf_url, save_path, session):
-    # print(f"Baixando PDF de: {pdf_url}")
     try:
         response = session.get(pdf_url, stream=True, timeout=30)
         if response.status_code == 200 and 'application/pdf' in response.headers.get('Content-Type', ''):
             with open(save_path, 'wb') as f:
                 for chunk in response.iter_content(1024):
                     f.write(chunk)
-            # print(f"PDF salvo em: {save_path}")
         else:
             print(f"Falha ao baixar PDF. Status: {response.status_code}. Tipo: {response.headers.get('Content-Type')}")
     except requests.exceptions.RequestException as e:
@@ -175,7 +161,6 @@ def download_pdf(pdf_url, save_path, session):
 
 def fetch_pdfs_from_page(response_text, session, unique_pdf_urls, pdf_count):
     popup_links = re.findall(r"popup\('(/cdje/consultaSimples\.do\?.+?)'\)", response_text)
-    print(f"Encontrados {len(popup_links)} links de PDFs na página.")
 
     for relative_url in popup_links:
       params_match = re.search(r'\?(.*)', relative_url)
@@ -191,7 +176,6 @@ def fetch_pdfs_from_page(response_text, session, unique_pdf_urls, pdf_count):
 def run_scraping():
   if not os.path.exists(OUTPUT_DIR_PDF):
         os.makedirs(OUTPUT_DIR_PDF)
-        print(f"Diretório criado: {OUTPUT_DIR_PDF}")
 
   session = requests.Session()
   unique_pdf_urls = set()
@@ -204,7 +188,6 @@ def run_scraping():
 
     page_number = 2
     while True:
-        # print(f"Fazendo requisição para a página {page_number}...")
         troca_data = f'pagina={page_number}&_='
 
         cookies_str = '; '.join([f"{key}={value}" for key, value in session.cookies.get_dict().items()])
@@ -235,11 +218,8 @@ def run_job():
 
 if __name__ == "__main__":
     try:
-        # Criar a tabela se não existir
-        # create_publications_table()
         run_scraping()
         process_all_pdfs()
-        # run_job()
     except Exception as e:
         print(f"Erro durante a execução: {e}")
     finally:

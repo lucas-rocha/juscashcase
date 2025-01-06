@@ -18,3 +18,11 @@ export const timeSinceUpdate = (inputDate: string | Date): string => {
 
   return "agora";
 };
+
+
+export const formatDate = (dateString: string | undefined) => {
+  if(dateString) {
+    const [year, month, day] = dateString.split('-');
+    return `${day}/${month}/${year}`;
+  }
+}

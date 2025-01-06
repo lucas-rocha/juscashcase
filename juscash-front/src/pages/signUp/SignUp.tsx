@@ -72,7 +72,7 @@ const SignUp: React.FC = () => {
     <Form buttonValue="Criar conta" isCreate={true} onClick={(e) => handleSubmit(e)}>
       <Input 
         label="Seu nome completo:" 
-        id="name" 
+        id="fullname" 
         type="text"
         value={fullname}
         onChange={(e) => setFullname(e.target.value)}

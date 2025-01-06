@@ -24,18 +24,18 @@
   }
 
   .modal-content::-webkit-scrollbar {
-    width: 8px; /* Largura do scrollbar */
+    width: 8px;
   }
   
   .modal-content::-webkit-scrollbar-thumb {
-    background-color: #c2c2c2;    /* Cor do thumb */
-    border-radius: 20px;       /* Arredondamento do thumb */
-    border: 3px solid #c2c2c2;  /* Padding ao redor do thumb */
+    background-color: #c2c2c2;
+    border-radius: 20px;
+    border: 3px solid #c2c2c2;
   }
   
   .modal-content::-webkit-scrollbar-track {
-    background-color: #fff; /* Cor do trilho (track) */
-    border-radius: 20px;         /* Opcional: arredondamento do trilho */
+    background-color: #fff;
+    border-radius: 20px;
   }
   
   .close-button {

@@ -1,6 +1,7 @@
 .dash__container {
-  max-width: 1360px;
+  max-width: 1380px;
   margin: 0 auto;
+  padding-bottom: 20rem;
 }
 
 .kanban-filter__container {
@@ -9,8 +10,7 @@
 }
 
 .kanban__container {
-  max-height: 80vh;  /* Ajuste a altura conforme necessário */
-  /* overflow-y: auto;  */
+  max-height: 80vh;
   margin-top: 1rem;
   background: #fff;
 }

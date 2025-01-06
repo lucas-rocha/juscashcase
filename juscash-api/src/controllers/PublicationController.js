@@ -34,10 +34,10 @@ class PublicationController {
   
       // Mapeamento de status para títulos
       const statusTitles = {
-        nova: "Publicações novas",
-        lida: "Publicações Lidas",
-        enviada_adv: "Publicações Enviadas para o Advogado",
-        concluida: "Publicações Concluídas",
+        nova: "Nova Publicação",
+        lida: "Publicação Lida",
+        enviada_adv: "Enviar para Advogado Responsável",
+        concluida: "Concluído",
       };
   
       // Inicializar o agrupamento com todas as colunas, garantindo que todos os status tenham a propriedade 'tasks'

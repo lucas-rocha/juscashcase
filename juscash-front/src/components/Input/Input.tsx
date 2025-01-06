@@ -13,8 +13,8 @@ const Input: React.FC<InputProps> = ({ label, id, type, value, onChange }) => {
     <div className="form-group">
       <label htmlFor={id}>{label}</label>
       <input 
-        type="email"
-        name="email"
+        type={type}
+        name={id}
         id={id}
         required={true}
         value={value}

@@ -19,8 +19,38 @@ const Dashboard: React.FC = () => {
   const [offset, setOffset] = useState(0); // Estado para o offset de carregamento incremental
   const [loading, setLoading] = useState(false); // Controla o estado de carregamento
 
+  const mesclarObjetosSemDuplicar = (anterior: any, atual: any) => {
+    const resultado = { ...anterior };
+  
+    for (const chave in atual) {
+      if (resultado[chave]) {
+        // Combina as tarefas existentes com as novas
+        const todasAsTarefas = [...resultado[chave].tasks, ...atual[chave].tasks];
+  
+        // Cria um Map para eliminar duplicações com base no 'id'
+        const tarefasUnicasMap = new Map();
+        todasAsTarefas.forEach(tarefa => {
+          tarefasUnicasMap.set(tarefa.id, tarefa);
+        });
+  
+        // Atualiza as tarefas da categoria com as tarefas únicas
+        resultado[chave].tasks = Array.from(tarefasUnicasMap.values());
+      } else {
+        // Se a categoria não existe no objeto anterior, adiciona-a diretamente
+        resultado[chave] = atual[chave];
+      }
+    }
+  
+    return resultado;
+  };
   useEffect(() => {
-    fetchFilteredData(); // Buscar dados iniciais
+    if (offset === 0 && !loading) {
+      fetchFilteredData();
+    }
+  }, [offset, loading]);
+  
+  useEffect(() => {
+    fetchFilteredData(); 
   }, []);
 
   useEffect(() => {
@@ -47,11 +77,14 @@ const Dashboard: React.FC = () => {
 
     setLoading(true); // Define como "carregando" para bloquear novas requisições
 
+    console.log("offset", offset)
+
     try {
       const response = await getCardByFilter({ ...filters, offset, limit: 10 });
       setKanbanData((prevData) => {
         const newData = { ...prevData, ...response };
-        return newData;
+        // mesclarObj(prevData, response)
+        return mesclarObjetosSemDuplicar(prevData, response)
       });
       setOffset((prevOffset) => prevOffset + 10); // Atualiza o offset
     } catch (error) {
@@ -70,7 +103,7 @@ const Dashboard: React.FC = () => {
 
   const handleFilterSubmit = () => {
     setOffset(0); // Resetar o offset ao aplicar novos filtros
-    fetchFilteredData(); // Rebuscar dados com base nos filtros atualizados
+    setKanbanData({}) // Rebuscar dados com base nos filtros atualizados
   };
 
   const fetchTaskDetails = async (id: string) => {

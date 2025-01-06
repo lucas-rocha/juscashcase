@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import { timeSinceUpdate } from '../../utils/KanbanUtils'
+import { formatDate, timeSinceUpdate } from '../../utils/KanbanUtils'
 import './kanban.css';
 import { LuClock4 } from "react-icons/lu";
 import { IoIosCalendar } from "react-icons/io";
@@ -11,6 +11,9 @@ type Task = {
   id: string;
   processNumber: string;
   authors: string;
+  availabilityData: string;
+  defendant: string;
+  lawyers: string;
   content: string;
   updatedAt: string;
 };
@@ -26,7 +29,7 @@ type KanbanBoard = {
 };
 
 type KanbanProps = {
-  data: KanbanBoard; // Dados do Kanban passados como props
+  data: KanbanBoard;
   setKanbanData: React.Dispatch<React.SetStateAction<KanbanBoard>>;
   onCardClick: (value: string) => void
 };
@@ -119,16 +122,16 @@ const Kanban: React.FC<KanbanProps> = ({ data, setKanbanData, onCardClick }) => 
               >
                 {column.title === 'Publicações Concluídas' ? (
                   <>
-                    <h3 className="kanban__title kanban__title--finish">
+                    <h4 className="kanban__title kanban__title--finish">
                       {column.title}
                       <span>{column.tasks.length}</span>
-                    </h3>
+                    </h4>
                   </>
                 ):
-                  <h3 className="kanban__title">
+                  <h4 className="kanban__title">
                     {column.title}
                     <span>{column.tasks.length}</span>
-                  </h3>
+                  </h4>
                 }
                 <div className="kanban__body">
                   {column.tasks.map((task, index) => (
@@ -151,7 +154,7 @@ const Kanban: React.FC<KanbanProps> = ({ data, setKanbanData, onCardClick }) => 
                           <p>{task.processNumber}</p>
                           <div className="kanban__status">
                             <span><LuClock4 color="#80929a" />{timeSinceUpdate(task.updatedAt)}</span>
-                            <span><IoIosCalendar color="#80929a" />01/01/2025</span>
+                            <span><IoIosCalendar color="#80929a" />{formatDate(task.availabilityData)}</span>
                           </div>
                         </div>
                       )}
