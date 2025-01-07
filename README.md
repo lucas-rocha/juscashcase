@@ -3,6 +3,12 @@
 ## Visão Geral
 O JusCash é um sistema completo que integra uma API, um banco de dados PostgreSQL e uma interface frontend. Este projeto utiliza o Docker Compose para simplificar o processo de configuração e execução local dos seus componentes.
 
+## Acesse o projeto em produção:
+
+Projeto em produção rodando na AWS (EC2):
+
+http://54.233.13.73
+
 ## Requisitos para Execução Local
 
 Certifique-se de que seu ambiente atenda aos seguintes requisitos:
@@ -31,6 +37,29 @@ Certifique-se de que seu ambiente atenda aos seguintes requisitos:
    - O banco de dados PostgreSQL na porta 5432
    - A API na porta 5000
    - O frontend na porta 3000
+
+4. Execute a Migration
+
+Execute os comandos abaixo para executar as migrations:
+
+    ```bash
+    docker exec -it juscash_api /bin/bash
+    npx prisma migrate dev
+    ```
+
+5. Rodar a aplicação scraping (Python)
+
+Execute os comandos abaixo para criar um rede compartilhada entre o banco de dados e a aplicação em Python
+
+    ```bash
+    docker network create juscash_network
+    docker network connect juscash_network juscash_database
+    ```
+
+    ```bash
+    docker build -t scraping .
+    docker run --rm --network juscash_network scraping
+    ```
 
 4. Verifique se os contêineres estão em execução:
    ```bash
