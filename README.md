@@ -95,6 +95,11 @@ Content-Type: application/json
 }
 ```
 
+### Rotas Protegidas
+
+Em todas as rotas protegidas é necessario passar na requisição no header o token através do x-access-token. Todas as rotas de publicação estão protegidas para que apenas usuário logado tenha acesso e manipule a mesma.
+
+O frontend da aplicação passa automaticamento esta chave a partir do login do usuário.
 
 ### Busca todas as publicações
 #### Requisição:
