@@ -17,7 +17,7 @@ services:
     container_name: juscash_api
     ports:
       - "5000:5000"
-      - "5555:5555"
+      # - "5555:5555"
     depends_on:
       - database
     environment:

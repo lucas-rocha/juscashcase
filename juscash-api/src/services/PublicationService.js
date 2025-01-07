@@ -4,6 +4,10 @@ const prisma = new PrismaClient();
 
 class PublicationService {
   async getPublications({ search, dataInicio, dataFim, offset, limit }) {
+    // Formatar dataInicio e dataFim para o formato correto de string (YYYY-MM-DD)
+    const formattedDataInicio = dataInicio ? new Date(dataInicio).toISOString().split('T')[0] : null;
+    const formattedDataFim = dataFim ? new Date(dataFim).toISOString().split('T')[0] : null;
+  
     const where = {
       ...(search && {
         OR: [
@@ -13,29 +17,30 @@ class PublicationService {
           { lawyers: { contains: search, mode: "insensitive" } },
         ],
       }),
-      ...(dataInicio && {
-        createdAt: { gte: new Date(dataInicio) }, // Se apenas dataInicio for fornecido
+      ...(formattedDataInicio && {
+        availabilityData: { gte: formattedDataInicio }, // Comparando como string
       }),
-      ...(dataFim && {
-        createdAt: { lte: new Date(dataFim) }, // Se apenas dataFim for fornecido
+      ...(formattedDataFim && {
+        availabilityData: { lte: formattedDataFim }, // Comparando como string
       }),
-      ...(dataInicio && dataFim && {
-        createdAt: {
-          gte: new Date(dataInicio),
-          lte: new Date(dataFim),
-        }, // Caso ambas as datas sejam fornecidas
+      ...(formattedDataInicio && formattedDataFim && {
+        availabilityData: {
+          gte: formattedDataInicio,
+          lte: formattedDataFim,
+        },
       }),
     };
-
+  
     // Buscar as publicações com os filtros aplicados
     const publications = await prisma.publications.findMany({
       where,
       skip: offset,
       take: limit,
     });
-
+  
     return publications;
   }
+  
 
   async getPublicationById(id) {
     try {

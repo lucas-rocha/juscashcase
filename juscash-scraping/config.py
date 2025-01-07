@@ -62,6 +62,7 @@ HEADERS_CONSULTA_SEGUINTE = {
   'sec-ch-ua-platform': '"Linux"',
 }
 
-data_atual = datetime.now().strftime('%d%%2F%m%%2F%Y')
+actual_data = datetime.now().strftime('%d%%2F%m%%2F%Y')
 
-PARAMS_CONSULTA = f'dadosConsulta.dtInicio=19%2F12%2F2024&dadosConsulta.dtFim=19%2F12%2F2024&dadosConsulta.cdCaderno=12&dadosConsulta.pesquisaLivre=%22RPV%22+e+%22pagamento+pelo+INSS%22&pagina='
+# PARAMS_CONSULTA = f'dadosConsulta.dtInicio=19%2F12%2F2024&dadosConsulta.dtFim=19%2F12%2F2024&dadosConsulta.cdCaderno=12&dadosConsulta.pesquisaLivre=%22RPV%22+e+%22pagamento+pelo+INSS%22&pagina='
+PARAMS_CONSULTA = f'dadosConsulta.dtInicio={actual_data}&dadosConsulta.dtFim={actual_data}&dadosConsulta.cdCaderno=12&dadosConsulta.pesquisaLivre=%22RPV%22+e+%22pagamento+pelo+INSS%22&pagina='
