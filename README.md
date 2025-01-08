@@ -21,16 +21,16 @@ Certifique-se de que seu ambiente atenda aos seguintes requisitos:
 
 ## Instruções de Instalação e Execução
 
-1. Clone o repositório:
+### 1. Clone o repositório:
 
    ```bash
    git clone https://github.com/lucas-rocha/juscashcase.git
    cd juscashcase
    ```
 
-2. Certifique-se de que os arquivos `Dockerfile` estão configurados corretamente nos diretórios `juscash-api` e `juscash-front`.
+### 2. Certifique-se de que os arquivos `Dockerfile` estão configurados corretamente nos diretórios `juscash-api` e `juscash-front`.
 
-3. Inicie os serviços:
+### 3. Inicie os serviços:
 
    ```bash
    docker-compose up -d
@@ -41,7 +41,7 @@ Certifique-se de que seu ambiente atenda aos seguintes requisitos:
    - A API na porta 5000
    - O frontend na porta 3000
 
-4. Execute a Migration
+### 4. Execute a Migration
 
 Execute os comandos abaixo para executar as migrations:
 
@@ -50,7 +50,7 @@ Execute os comandos abaixo para executar as migrations:
   npx prisma migrate dev
   ```
 
-5. Rodar a aplicação scraping (Python)
+### 5. Rodar a aplicação scraping (Python)
 
 Execute os comandos abaixo para criar um rede compartilhada entre o banco de dados e a aplicação em Python
 
@@ -69,7 +69,7 @@ Executando o container Docker:
 
 O container `scraping` utiliza o parâmetro `PARAMS_CONSULTA` para realizar consultas. Existem dois casos de uso para este parâmetro. Siga as instruções abaixo para executar o container corretamente.
 
-### Passo 1: Executar com o código inicial
+### Passo 5. 1: Executar com o código inicial
 
 Certifique-se de que o código no arquivo config.py onde o `PARAMS_CONSULTA` está definido tenha a seguinte configuração:
 
@@ -83,10 +83,10 @@ Assim, a aplicação buscará os dados usando a data 19/12/2024.
 Execute o seguinte comando no terminal para rodar o container:
 
   ```bash
-    docker run --rm --network juscash_network scraping
+  docker run --rm --network juscash_network scraping
   ```
 
-### Passo 2: Executar com o código alternativo
+### Passo 5.2: Executar com o código alternativo
 
 Edite o código para que a configuração do PARAMS_CONSULTA esteja como mostrado abaixo no config.py:
 
@@ -97,7 +97,7 @@ Edite o código para que a configuração do PARAMS_CONSULTA esteja como mostrad
 
 Assim, a aplicação buscará os dados usando a data atual. A partir disso, devemos criar um job que executa o seguinte comando para rodar o container diaramente às 00:00.
 
-### Passo 3: Criar e executar o código alternativo com o job
+### Passo 5.3: Criar e executar o código alternativo com o job
 
 Iremos usar o crontab que automatiza todo o processo. Execute:
 
@@ -111,18 +111,17 @@ Assim irá abrir um editor (Vim ou nano). Cole o seguinte código e salve:
 0 24 * * *  docker run --rm --network juscash_network scraping
 ```
 
-
-4. Verifique se os contêineres estão em execução:
+### 4. Verifique se os contêineres estão em execução:
 
    ```bash
    docker ps
    ```
 
-5. Acesse os serviços:
+### 5. Acesse os serviços:
    - API: [http://localhost:5000](http://localhost:5000)
    - Frontend: [http://localhost:3000](http://localhost:3000)
 
-6. Para parar os serviços:
+### 6. Para parar os serviços:
 
    ```bash
    docker-compose down
