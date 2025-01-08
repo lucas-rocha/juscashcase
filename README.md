@@ -71,12 +71,14 @@ O container `scraping` utiliza o parâmetro `PARAMS_CONSULTA` para realizar cons
 
 ### Passo 1: Executar com o código inicial
 
-Certifique-se de que o código no arquivo onde o `PARAMS_CONSULTA` está definido tenha a seguinte configuração:
+Certifique-se de que o código no arquivo config.py onde o `PARAMS_CONSULTA` está definido tenha a seguinte configuração:
 
   ```bash
   PARAMS_CONSULTA = f'dadosConsulta.dtInicio=19%2F12%2F2024&dadosConsulta.dtFim=19%2F12%2F2024&dadosConsulta.cdCaderno=12&dadosConsulta.pesquisaLivre=%22RPV%22+e+%22pagamento+pelo+INSS%22&pagina='
   # PARAMS_CONSULTA = f'dadosConsulta.dtInicio={actual_data}&dadosConsulta.dtFim={actual_data}&dadosConsulta.cdCaderno=12&dadosConsulta.pesquisaLivre=%22RPV%22+e+%22pagamento+pelo+INSS%22&pagina='
   ```
+
+Assim, a aplicação buscará os dados usando a data 19/12/2024.
 
 Execute o seguinte comando no terminal para rodar o container:
 
@@ -93,11 +95,22 @@ Edite o código para que a configuração do PARAMS_CONSULTA esteja como mostrad
   PARAMS_CONSULTA = f'dadosConsulta.dtInicio={actual_data}&dadosConsulta.dtFim={actual_data}&dadosConsulta.cdCaderno=12&dadosConsulta.pesquisaLivre=%22RPV%22+e+%22pagamento+pelo+INSS%22&pagina='
   ```
 
-Novamente, execute o comando para rodar o container:
+Assim, a aplicação buscará os dados usando a data atual. A partir disso, devemos criar um job que executa o seguinte comando para rodar o container diaramente às 00:00.
+
+### Passo 3: Criar e executar o código alternativo com o job
+
+Iremos usar o crontab que automatiza todo o processo. Execute:
 
   ```bash
-  docker run --rm --network juscash_network scraping
+  crontab -e
   ```
+
+Assim irá abrir um editor (Vim ou nano). Cole o seguinte código e salve:
+
+```bash
+0 24 * * *  docker run --rm --network juscash_network scraping
+```
+
 
 4. Verifique se os contêineres estão em execução:
 
@@ -110,6 +123,7 @@ Novamente, execute o comando para rodar o container:
    - Frontend: [http://localhost:3000](http://localhost:3000)
 
 6. Para parar os serviços:
+
    ```bash
    docker-compose down
    ```
@@ -117,7 +131,9 @@ Novamente, execute o comando para rodar o container:
 ## Exemplos de Requisições à API
 
 ### Registro de usuário
+
 #### Requisição:
+
 ```bash
 POST api/users
 Content-Type: application/json
@@ -130,6 +146,7 @@ Content-Type: application/json
 ```
 
 #### Resposta:
+
 ```json
 {
   "message": "Usuário criado com sucesso.",
@@ -142,7 +159,9 @@ Content-Type: application/json
 ```
 
 ### Autenticação
-#### Requisição:
+
+#### Requisição
+
 ```bash
 POST api/users/login
 Content-Type: application/json
@@ -153,7 +172,8 @@ Content-Type: application/json
 }
 ```
 
-#### Resposta:
+#### Resposta
+
 ```json
 {
   "message": "Usuário logado com sucesso.",
@@ -170,12 +190,15 @@ Em todas as rotas protegidas é necessario passar na requisição no header o to
 O frontend da aplicação passa automaticamento esta chave a partir do login do usuário.
 
 ### Busca todas as publicações
-#### Requisição:
+
+#### Requisição
+
 ```bash
 GET api/publications
 Content-Type: application/json
 x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYjdjMDZlYzYtNTVkZi00ZDQ1LWFiMmYtNzEwN2M4ZGY0MzFmIiwiaWF0IjoxNzM1NjkwMDgyfQ.RFB-pqu5WmnYKaLQDMQiZkDu_F9ebIVX7A-605HqQq8
 ```
+
 ### Parâmetros de Query
 
 | Nome         | Tipo     | Obrigatório | Descrição                                                                 |
@@ -187,7 +210,8 @@ x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYjdjMDZlYzY
 | `limit`      | Integer  | Não         | Limite de publicações por página, padrão é `30`. Controla o número de publicações retornadas. |
 
 
-#### Resposta:
+#### Resposta
+
 ```json
 {
   "nova": {
@@ -224,9 +248,11 @@ x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYjdjMDZlYzY
 ## Busca Publicação por ID
 
 ### Descrição
+
 Este endpoint permite buscar uma publicação específica com base no seu ID.
 
 ### URL
+
 ```bash
 GET /api/publications/:id
 x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYjdjMDZlYzYtNTVkZi00ZDQ1LWFiMmYtNzEwN2M4ZGY0MzFmIiwiaWF0IjoxNzM1NjkwMDgyfQ.RFB-pqu5WmnYKaLQDMQiZkDu_F9ebIVX7A-605HqQq8
@@ -241,6 +267,7 @@ x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYjdjMDZlYzY
 ### Resposta
 
 #### Exemplo de Resposta Sucesso (200)
+
 ```json
 {
   "id": "123",
@@ -255,9 +282,11 @@ x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYjdjMDZlYzY
 ## Atualizar Status da Publicação
 
 ### Descrição
+
 Este endpoint permite atualizar o status de uma publicação específica com base no seu ID.
 
 ### URL
+
 ```bash
 PUT /api/publications/:id
 x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYjdjMDZlYzYtNTVkZi00ZDQ1LWFiMmYtNzEwN2M4ZGY0MzFmIiwiaWF0IjoxNzM1NjkwMDgyfQ.RFB-pqu5WmnYKaLQDMQiZkDu_F9ebIVX7A-605HqQq8
@@ -278,6 +307,7 @@ x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYjdjMDZlYzY
 ### Resposta
 
 #### Exemplo de Resposta Sucesso (200)
+
 ```json
 {
   "id": "123",
