@@ -7,7 +7,7 @@ O JusCash é um sistema completo que integra uma API, um banco de dados PostgreS
 
 Projeto em produção rodando na AWS (EC2):
 
-http://54.233.13.73
+http://54.233.13.73:3000
 
 ## Requisitos para Execução Local
 
@@ -22,6 +22,7 @@ Certifique-se de que seu ambiente atenda aos seguintes requisitos:
 ## Instruções de Instalação e Execução
 
 1. Clone o repositório:
+
    ```bash
    git clone https://github.com/lucas-rocha/juscashcase.git
    cd juscashcase
@@ -30,9 +31,11 @@ Certifique-se de que seu ambiente atenda aos seguintes requisitos:
 2. Certifique-se de que os arquivos `Dockerfile` estão configurados corretamente nos diretórios `juscash-api` e `juscash-front`.
 
 3. Inicie os serviços:
+
    ```bash
    docker-compose up -d
    ```
+
    Isso iniciará:
    - O banco de dados PostgreSQL na porta 5432
    - A API na porta 5000
@@ -42,26 +45,62 @@ Certifique-se de que seu ambiente atenda aos seguintes requisitos:
 
 Execute os comandos abaixo para executar as migrations:
 
-    ```bash
-    docker exec -it juscash_api /bin/bash
-    npx prisma migrate dev
-    ```
+  ```bash
+  docker exec -it juscash_api /bin/bash
+  npx prisma migrate dev
+  ```
 
 5. Rodar a aplicação scraping (Python)
 
 Execute os comandos abaixo para criar um rede compartilhada entre o banco de dados e a aplicação em Python
 
-    ```bash
-    docker network create juscash_network
-    docker network connect juscash_network juscash_database
-    ```
+  ```bash
+  docker network create juscash_network
+  docker network connect juscash_network juscash_database
+  ```
 
-    ```bash
-    docker build -t scraping .
+Execute o comando abaixo para construir a imagem da aplicação:
+
+  ```bash
+  docker build -t scraping .
+  ```
+ 
+Executando o container Docker:
+
+O container `scraping` utiliza o parâmetro `PARAMS_CONSULTA` para realizar consultas. Existem dois casos de uso para este parâmetro. Siga as instruções abaixo para executar o container corretamente.
+
+### Passo 1: Executar com o código inicial
+
+Certifique-se de que o código no arquivo onde o `PARAMS_CONSULTA` está definido tenha a seguinte configuração:
+
+  ```bash
+  PARAMS_CONSULTA = f'dadosConsulta.dtInicio=19%2F12%2F2024&dadosConsulta.dtFim=19%2F12%2F2024&dadosConsulta.cdCaderno=12&dadosConsulta.pesquisaLivre=%22RPV%22+e+%22pagamento+pelo+INSS%22&pagina='
+  # PARAMS_CONSULTA = f'dadosConsulta.dtInicio={actual_data}&dadosConsulta.dtFim={actual_data}&dadosConsulta.cdCaderno=12&dadosConsulta.pesquisaLivre=%22RPV%22+e+%22pagamento+pelo+INSS%22&pagina='
+  ```
+
+Execute o seguinte comando no terminal para rodar o container:
+
+  ```bash
     docker run --rm --network juscash_network scraping
-    ```
+  ```
+
+### Passo 2: Executar com o código alternativo
+
+Edite o código para que a configuração do PARAMS_CONSULTA esteja como mostrado abaixo:
+
+  ```bash
+  # PARAMS_CONSULTA = f'dadosConsulta.dtInicio=19%2F12%2F2024&dadosConsulta.dtFim=19%2F12%2F2024&dadosConsulta.cdCaderno=12&dadosConsulta.pesquisaLivre=%22RPV%22+e+%22pagamento+pelo+INSS%22&pagina='
+  PARAMS_CONSULTA = f'dadosConsulta.dtInicio={actual_data}&dadosConsulta.dtFim={actual_data}&dadosConsulta.cdCaderno=12&dadosConsulta.pesquisaLivre=%22RPV%22+e+%22pagamento+pelo+INSS%22&pagina='
+  ```
+
+Novamente, execute o comando para rodar o container:
+
+  ```bash
+  docker run --rm --network juscash_network scraping
+  ```
 
 4. Verifique se os contêineres estão em execução:
+
    ```bash
    docker ps
    ```
