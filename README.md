@@ -86,7 +86,7 @@ Execute o seguinte comando no terminal para rodar o container:
 
 ### Passo 2: Executar com o código alternativo
 
-Edite o código para que a configuração do PARAMS_CONSULTA esteja como mostrado abaixo:
+Edite o código para que a configuração do PARAMS_CONSULTA esteja como mostrado abaixo no config.py:
 
   ```bash
   # PARAMS_CONSULTA = f'dadosConsulta.dtInicio=19%2F12%2F2024&dadosConsulta.dtFim=19%2F12%2F2024&dadosConsulta.cdCaderno=12&dadosConsulta.pesquisaLivre=%22RPV%22+e+%22pagamento+pelo+INSS%22&pagina='
